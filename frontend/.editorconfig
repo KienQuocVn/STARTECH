@@ -1,0 +1,24 @@
+[*]
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+[*.{js,jsx,ts,tsx,json,css,scss,md}]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+[*.{json,md}]
+indent_size = 2
+[*.{js,jsx,ts,tsx}]
+quote_type = single
+[*.ts]
+max_line_length = 120
+[*.tsx]
+max_line_length = 120
+[*.{json,md}]
+max_line_length = 80
+[*.{css,scss}]
+max_line_length = 80
+[*.md]
+max_line_length = off
+[*.{json,md}]
+trim_trailing_whitespace = false
