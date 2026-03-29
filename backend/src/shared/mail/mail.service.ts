@@ -31,36 +31,15 @@ export class MailService {
     this.transporter = nodemailer.createTransport(transportOptions);
   }
 
-  async sendMail(
-    to: string,
-    subject: string,
-    templateName: string,
-    context: Record<string, any>,
-    from?: string,
-  ) {
+  async sendMail(to: string, subject: string, templateName: string, context: Record<string, any>, from?: string) {
     try {
       if (!this.transporter) {
         this.logger.warn(`Skipping email to ${to} because SMTP is not configured.`);
         return null;
       }
 
-      const sourceTemplatePath = path.join(
-        process.cwd(),
-        'src',
-        'shared',
-        'templates',
-        'emails',
-        `${templateName}.html`,
-      );
-      const distTemplatePath = path.join(
-        process.cwd(),
-        'dist',
-        'src',
-        'shared',
-        'templates',
-        'emails',
-        `${templateName}.html`,
-      );
+      const sourceTemplatePath = path.join(process.cwd(), 'src', 'shared', 'templates', 'emails', `${templateName}.html`);
+      const distTemplatePath = path.join(process.cwd(), 'dist', 'src', 'shared', 'templates', 'emails', `${templateName}.html`);
       const templatePath = fs.existsSync(sourceTemplatePath) ? sourceTemplatePath : distTemplatePath;
 
       this.logger.log(`Looking for template at: ${templatePath}`);

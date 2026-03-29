@@ -6,6 +6,7 @@ import { UpdateShowcaseDto } from './dto/update-showcase.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Permissions } from '../auth/permissions.decorator';
 
 @ApiTags('Showcase')
 @Controller('showcase')
@@ -22,6 +23,7 @@ export class ShowcaseController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('showcase.write')
   @ApiOperation({ summary: 'Tao showcase admin' })
   create(@Body() createShowcaseDto: CreateShowcaseDto) {
     return this.showcaseService.create(createShowcaseDto);
@@ -30,6 +32,7 @@ export class ShowcaseController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('showcase.write')
   @ApiOperation({ summary: 'Cap nhat showcase admin' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateShowcaseDto: UpdateShowcaseDto) {
     return this.showcaseService.update(id, updateShowcaseDto);
@@ -38,6 +41,7 @@ export class ShowcaseController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('showcase.delete')
   @ApiOperation({ summary: 'Xoa showcase admin' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.showcaseService.remove(id);

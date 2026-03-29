@@ -2,10 +2,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AdminRole, JwtPayload } from './interfaces/jwt-payload.interface';
+import { resolvePermissionsForRole } from './permissions';
 
 const ADMIN_ROLES: Record<AdminRole, { label: string; description: string }> = {
   SUPER_ADMIN: {
@@ -27,6 +29,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly businessEvents: BusinessEventsService,
   ) {}
 
   private getRefreshTtlMs() {
@@ -38,6 +41,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
+      permissions: resolvePermissionsForRole(user.role),
     };
 
     const accessToken = await this.jwtService.signAsync(payload);
@@ -91,6 +95,16 @@ export class AuthService {
       role: user.role,
     });
 
+    this.businessEvents.log({
+      entity: 'auth',
+      action: 'login.success',
+      actorId: user.id,
+      metadata: {
+        email: user.email,
+        role: user.role,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -102,6 +116,7 @@ export class AuthService {
           email: user.email,
           fullName: user.fullName,
           role: user.role,
+          permissions: resolvePermissionsForRole(user.role),
           lastLoginAt: new Date().toISOString(),
         },
       },
@@ -152,6 +167,15 @@ export class AuthService {
       role: payload.role,
     });
 
+    this.businessEvents.log({
+      entity: 'auth',
+      action: 'token.refresh',
+      actorId: payload.sub,
+      metadata: {
+        email: payload.email,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -176,6 +200,13 @@ export class AuthService {
         await (this.prisma as any).refreshToken.update({
           where: { id: storedToken.id },
           data: { revokedAt: new Date() },
+        });
+        this.businessEvents.log({
+          entity: 'auth',
+          action: 'logout.success',
+          metadata: {
+            refreshTokenId: storedToken.id,
+          },
         });
         break;
       }
@@ -211,7 +242,10 @@ export class AuthService {
       success: true,
       statusCode: StatusCodes.OK,
       message: 'Lay thong tin nguoi dung thanh cong.',
-      data: user,
+      data: {
+        ...user,
+        permissions: resolvePermissionsForRole(user.role),
+      },
     };
   }
 
@@ -225,6 +259,7 @@ export class AuthService {
           value,
           label: config.label,
           description: config.description,
+          permissions: resolvePermissionsForRole(value as AdminRole),
         })),
       },
     };

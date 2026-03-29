@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
@@ -93,7 +91,7 @@ describe('ProductController', () => {
       expect(Array.isArray(result.data!.items)).toBe(true);
       expect(result.data).toHaveProperty('page', 1);
       expect(result.data).toHaveProperty('limit', 10);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(service.findAll).toHaveBeenCalledWith(mockQuery);
     });
 
@@ -118,7 +116,7 @@ describe('ProductController', () => {
       const result = await controller.findAll({});
       expect(result.statusCode).toBe(200);
       expect(result.message).toContain('Lấy danh sách sản phẩm');
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(service.findAll).toHaveBeenCalledWith({});
     });
   });
@@ -151,7 +149,7 @@ describe('ProductController', () => {
       expect(result.message).toBe('Lấy thông tin sản phẩm thành công.');
       expect(result.data).toBeTruthy();
       expect(result.data).toHaveProperty('id', 1);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(service.findOne).toHaveBeenCalledWith(mockId);
     });
 
@@ -167,7 +165,6 @@ describe('ProductController', () => {
 
       const result = await controller.findOne(mockId);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.findOne).toHaveBeenCalledWith(mockId);
       expect(result.success).toBe(false);
       expect(result.statusCode).toBe(404);
@@ -187,7 +184,6 @@ describe('ProductController', () => {
 
       const result = await controller.findOne(mockId);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.findOne).toHaveBeenCalledWith(mockId);
       expect(result.success).toBe(false);
       expect(result.statusCode).toBe(500);

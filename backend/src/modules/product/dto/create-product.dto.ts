@@ -1,17 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsIn,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUrl, MaxLength, Min } from 'class-validator';
 
 export class CreateProductDto {
   @ApiPropertyOptional({ example: 'website-thuong-hieu-startech' })

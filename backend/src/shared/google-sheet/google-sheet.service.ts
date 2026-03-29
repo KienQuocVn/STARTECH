@@ -10,9 +10,9 @@ export class GoogleSheetsService implements OnModuleInit {
   private readonly enabled: boolean;
 
   // ==================== CẤU HÌNH TÊN SHEET ====================
-  private readonly SHEET_NAME = 'Thong tin lien he';           // Tên sheet thật
-  private readonly HEADER_RANGE = `'${this.SHEET_NAME}'!A1:H1`;   // Đúng format
-  private readonly DATA_RANGE = `'${this.SHEET_NAME}'!A:H`;       // Đúng format
+  private readonly SHEET_NAME = 'Thong tin lien he'; // Tên sheet thật
+  private readonly HEADER_RANGE = `'${this.SHEET_NAME}'!A1:H1`; // Đúng format
+  private readonly DATA_RANGE = `'${this.SHEET_NAME}'!A:H`; // Đúng format
 
   constructor() {
     const base64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64;
@@ -59,7 +59,7 @@ export class GoogleSheetsService implements OnModuleInit {
     try {
       await this.sheets.spreadsheets.values.append({
         spreadsheetId: this.spreadsheetId,
-        range: this.DATA_RANGE,                    // ← Sửa ở đây
+        range: this.DATA_RANGE, // ← Sửa ở đây
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: [values] },
       });
@@ -79,7 +79,7 @@ export class GoogleSheetsService implements OnModuleInit {
     try {
       await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.spreadsheetId,
-        range: this.HEADER_RANGE,                  // ← Sửa ở đây
+        range: this.HEADER_RANGE, // ← Sửa ở đây
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: [headers] },
       });
@@ -97,7 +97,7 @@ export class GoogleSheetsService implements OnModuleInit {
     try {
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.HEADER_RANGE,                  // ← Sửa ở đây
+        range: this.HEADER_RANGE, // ← Sửa ở đây
       });
 
       if (!response.data.values || response.data.values.length === 0) {
@@ -119,20 +119,16 @@ export class GoogleSheetsService implements OnModuleInit {
         {
           setDataValidation: {
             range: {
-              sheetId: 0,                    // Thường là sheet đầu tiên
+              sheetId: 0, // Thường là sheet đầu tiên
               startRowIndex: 1,
               endRowIndex: 1000,
-              startColumnIndex: 7,           // Cột H (Trang thai)
+              startColumnIndex: 7, // Cột H (Trang thai)
               endColumnIndex: 8,
             },
             rule: {
               condition: {
                 type: 'ONE_OF_LIST',
-                values: [
-                  { userEnteredValue: 'Cho doi' },
-                  { userEnteredValue: 'Da xem' },
-                  { userEnteredValue: 'Da xu ly' },
-                ],
+                values: [{ userEnteredValue: 'Cho doi' }, { userEnteredValue: 'Da xem' }, { userEnteredValue: 'Da xu ly' }],
               },
               inputMessage: 'Chon trang thai phu hop',
               strict: true,

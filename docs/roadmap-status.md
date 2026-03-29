@@ -1,20 +1,22 @@
-### Con lai
+## Phase 3 - Backend Hardening & Frontend Standards
+### Cap nhat
 
-- [ ] Review va go dependency UI thua sau khi chot scope giao dien.
-- [ ] Test metadata/SEO routes.
-- [ ] Thiet lap CI/CD lint + build + test.
-- [ ] Monitoring backend/frontend cho production.
-- [ ] Legacy model naming van chua duoc chuan hoa tron ven.
+- [~] Legacy model naming van chua duoc chuan hoa tron ven.
+  Application layer da duoc bo sung permission matrix va business-event logging, nhung schema legacy (`product`, `services`, `contact_submission`...) van chua duoc migration dong bo sang naming PascalCase.
 
 ---
 
 ## Phase 4 - Dynamic Content & Admin Foundation
-### Con lai
 
-- [ ] UI CRUD day du trong dashboard admin cho tat ca module.
-- [ ] Permission granularity sau enum role co ban.
-- [ ] Refactor dan cac service cu dang return object thu cong.
+### Cap nhat
+
+- [~] Permission granularity vuot qua enum role co ban.
+  Da co permission matrix (`product.write`, `content.delete`, `settings.read`...) va guard check theo permission ben canh role.
+  Chua co permission tables trong DB va chua co UI quan tri permission dong.
+- [~] Refactor dan service cu dang return object thu cong.
+  Cac module admin moi cham den da duoc day ve pattern exception/structured response ro hon, nhung nhieu service legacy van can refactor tiep.
 - [ ] Hoan thien workflow publish/content approval neu can.
+  Hien tai admin da CRUD truc tiep du lieu that va co `isActive` cho section/faq, nhung chua co workflow approve/publish rieng theo role o cap page/content lifecycle.
 
 ---
 
@@ -22,11 +24,19 @@
 
 ### Dang tiep tuc
 
-- [ ] Gan UI CMS thuc te cho `SitePage`, `PageSection`, `FaqItem`.
-- [ ] Gan UI quan ly lead/contact submission.
-- [ ] Gan UI quan ly portfolio/showcase/category/pricing/feedback.
-- [ ] Production deploy docs hoan chinh.
+- [ ] Production deploy docs.
 - [ ] CDN/caching strategy cho asset nang va `.spline`.
-- [ ] Monitoring, backup, alerting.
+- [~] Monitoring, backup, alerting.
+  Da co `/health` cho backend, `/api/health` cho frontend va `BusinessEventsService` de lam baseline smoke/uptime/business log.
+  Alerting, dashboard observability, backup va on-call production van chua duoc thiet lap.
+
+### Ghi chu kiem chung
+
+- Frontend SEO metadata test script: `npm --prefix frontend test`
+- Frontend production build: `npm --prefix frontend run build`
+- Frontend type-check: `npx --prefix frontend tsc --noEmit -p frontend/tsconfig.json`
+- Backend build: `npm --prefix backend run build`
+- Backend lint: `npm --prefix backend run lint`
+- Backend unit test hien van do do bo spec legacy chua duoc cap nhat dong bo voi codebase moi.
 
 ---

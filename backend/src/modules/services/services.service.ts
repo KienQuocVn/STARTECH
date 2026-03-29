@@ -1,11 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { ResponseServiceDto } from './dto/response-service.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { StatusCodes } from 'http-status-codes';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateServiceDto } from './dto/create-service.dto';
+import { ResponseServiceDto } from './dto/response-service.dto';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServicesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
+
   async findAll(): Promise<ResponseServiceDto> {
     try {
       const result = await this.prisma.services.findMany({
@@ -13,24 +21,89 @@ export class ServicesService {
         select: { id: true, name: true },
       });
 
-      const responseObject = {
-        success: true,
-        statusCode: 200,
-        message: 'Lấy danh sách dịch vụ thành công',
-        data: result,
-      };
-
-      return plainToInstance(ResponseServiceDto, responseObject, {
-        enableImplicitConversion: true,
-      });
-    } catch (error) {
-      console.error(error);
-      return {
+      return plainToInstance(
+        ResponseServiceDto,
+        {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Lay danh sach dich vu thanh cong',
+          data: result,
+        },
+        {
+          enableImplicitConversion: true,
+        },
+      );
+    } catch {
+      throw new InternalServerErrorException({
         success: false,
-        statusCode: 500,
-        message: 'Đã xảy ra lỗi khi lấy danh sách dịch vụ',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        message: 'Da xay ra loi khi lay danh sach dich vu',
         data: null,
-      };
+      });
     }
+  }
+
+  async create(createServiceDto: CreateServiceDto) {
+    const service = await this.prisma.services.create({
+      data: {
+        name: createServiceDto.name,
+      },
+    });
+
+    this.businessEvents.log({
+      entity: 'services',
+      action: 'service.create',
+      entityId: service.id,
+      metadata: {
+        name: service.name,
+      },
+    });
+
+    return {
+      success: true,
+      statusCode: StatusCodes.CREATED,
+      message: 'Tao dich vu thanh cong.',
+      data: service,
+    };
+  }
+
+  async update(id: number, updateServiceDto: UpdateServiceDto) {
+    const service = await this.prisma.services.update({
+      where: { id },
+      data: updateServiceDto,
+    });
+
+    this.businessEvents.log({
+      entity: 'services',
+      action: 'service.update',
+      entityId: service.id,
+      metadata: updateServiceDto as Record<string, unknown>,
+    });
+
+    return {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Cap nhat dich vu thanh cong.',
+      data: service,
+    };
+  }
+
+  async remove(id: number) {
+    await this.prisma.services.delete({
+      where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'services',
+      action: 'service.delete',
+      entityId: id,
+    });
+
+    return {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Xoa dich vu thanh cong.',
+      data: { id },
+    };
   }
 }

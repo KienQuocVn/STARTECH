@@ -7,6 +7,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Permissions } from '../auth/permissions.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -66,6 +67,7 @@ export class ProductController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('product.write')
   @ApiOperation({ summary: 'Tao san pham admin' })
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
@@ -74,6 +76,7 @@ export class ProductController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('product.write')
   @ApiOperation({ summary: 'Cap nhat san pham admin' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
@@ -82,6 +85,7 @@ export class ProductController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('product.delete')
   @ApiOperation({ summary: 'Xoa san pham admin' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productService.remove(id);

@@ -30,4 +30,10 @@ export class CreatePricingPlanDto {
   @Type(() => Number)
   @IsInt({ each: true })
   featureIds?: number[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  featureNames?: string[];
 }

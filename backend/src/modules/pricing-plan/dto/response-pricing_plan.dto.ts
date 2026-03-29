@@ -12,6 +12,9 @@ export class PricingPlanData {
   price: number | null;
 
   @Expose()
+  price_Type?: 'FIXED' | 'CONTACT';
+
+  @Expose()
   features: { id: number; name: string; description: string }[];
 }
 

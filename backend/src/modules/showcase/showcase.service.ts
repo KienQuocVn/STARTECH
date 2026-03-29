@@ -3,10 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StatusCodes } from 'http-status-codes';
 import { CreateShowcaseDto } from './dto/create-showcase.dto';
 import { UpdateShowcaseDto } from './dto/update-showcase.dto';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 
 @Injectable()
 export class ShowcaseService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
 
   async findAll() {
     try {
@@ -20,7 +24,7 @@ export class ShowcaseService {
         message: 'Lay danh sach showcase thanh cong.',
         data: items,
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException({
         success: false,
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -39,6 +43,15 @@ export class ShowcaseService {
       },
     });
 
+    this.businessEvents.log({
+      entity: 'showcase_item',
+      action: 'showcase.create',
+      entityId: item.id,
+      metadata: {
+        name: item.name,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.CREATED,
@@ -53,6 +66,13 @@ export class ShowcaseService {
       data: updateShowcaseDto,
     });
 
+    this.businessEvents.log({
+      entity: 'showcase_item',
+      action: 'showcase.update',
+      entityId: item.id,
+      metadata: updateShowcaseDto as Record<string, unknown>,
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -64,6 +84,12 @@ export class ShowcaseService {
   async remove(id: number) {
     await this.prisma.showcase_item.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'showcase_item',
+      action: 'showcase.delete',
+      entityId: id,
     });
 
     return {

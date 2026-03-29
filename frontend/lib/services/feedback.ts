@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api-client'
+import { getAdminAuthHeaders } from '@/lib/services/auth'
 
 export type Feedback = {
   id: number
@@ -46,4 +47,19 @@ export async function getFeedbacks(params: { page?: number; limit?: number } = {
 // Tạo feedback mới
 export async function createFeedback(feedback: CreateFeedbackRequest) {
   return apiClient.post<ItemResponse<Feedback>>('/feedback', feedback)
+}
+
+export async function updateAdminFeedback(id: number, payload: Partial<CreateFeedbackRequest>) {
+  return apiClient.request<ItemResponse<Feedback>>(`/feedback/${id}`, {
+    method: 'PATCH',
+    headers: getAdminAuthHeaders(),
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function deleteAdminFeedback(id: number) {
+  return apiClient.request<{ success: boolean; data: { id: number } }>(`/feedback/${id}`, {
+    method: 'DELETE',
+    headers: getAdminAuthHeaders(),
+  })
 }

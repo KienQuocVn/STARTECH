@@ -7,6 +7,7 @@ import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Permissions } from '../auth/permissions.decorator';
 
 @ApiTags('Contact')
 @Controller('contact')
@@ -27,6 +28,7 @@ export class ContactController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
+  @Permissions('lead.read')
   @ApiOperation({ summary: 'Lay danh sach lead lien he cho admin' })
   findAll() {
     return this.contactService.findAll();
@@ -35,17 +37,16 @@ export class ContactController {
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('lead.write')
   @ApiOperation({ summary: 'Cap nhat trang thai lead' })
-  updateStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateContactStatusDto: UpdateContactStatusDto,
-  ) {
+  updateStatus(@Param('id', ParseIntPipe) id: number, @Body() updateContactStatusDto: UpdateContactStatusDto) {
     return this.contactService.updateStatus(id, updateContactStatusDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('lead.delete')
   @ApiOperation({ summary: 'Xoa lead lien he' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.contactService.remove(id);

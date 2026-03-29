@@ -4,12 +4,8 @@ import { SiteContentService } from './site-content.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import {
-  CreateSitePageDto,
-  UpdateSitePageDto,
-  UpsertFaqItemDto,
-  UpsertPageSectionDto,
-} from './dto/manage-site-content.dto';
+import { Permissions } from '../auth/permissions.decorator';
+import { CreateSitePageDto, UpdateSitePageDto, UpsertFaqItemDto, UpsertPageSectionDto } from './dto/manage-site-content.dto';
 
 @ApiTags('Site Content')
 @Controller('site-content')
@@ -26,6 +22,7 @@ export class SiteContentController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
+  @Permissions('content.read')
   @ApiOperation({ summary: 'Lay tat ca page content cho admin' })
   findAllPages() {
     return this.siteContentService.findAllPages();
@@ -34,6 +31,7 @@ export class SiteContentController {
   @Post('page')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('content.write')
   @ApiOperation({ summary: 'Tao page content admin' })
   createPage(@Body() createSitePageDto: CreateSitePageDto) {
     return this.siteContentService.createPage(createSitePageDto);
@@ -42,6 +40,7 @@ export class SiteContentController {
   @Patch('page/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('content.write')
   @ApiOperation({ summary: 'Cap nhat page content admin' })
   updatePage(@Param('id', ParseIntPipe) id: number, @Body() updateSitePageDto: UpdateSitePageDto) {
     return this.siteContentService.updatePage(id, updateSitePageDto);
@@ -50,6 +49,7 @@ export class SiteContentController {
   @Delete('page/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa page content admin' })
   removePage(@Param('id', ParseIntPipe) id: number) {
     return this.siteContentService.removePage(id);
@@ -58,6 +58,7 @@ export class SiteContentController {
   @Post('page/:pageId/section')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('content.write')
   @ApiOperation({ summary: 'Tao/cap nhat section admin' })
   upsertSection(@Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertPageSectionDto) {
     return this.siteContentService.upsertSection(pageId, dto);
@@ -66,6 +67,7 @@ export class SiteContentController {
   @Delete('section/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa section admin' })
   removeSection(@Param('id', ParseIntPipe) id: number) {
     return this.siteContentService.removeSection(id);
@@ -74,6 +76,7 @@ export class SiteContentController {
   @Post('page/:pageId/faq')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('content.write')
   @ApiOperation({ summary: 'Tao/cap nhat FAQ admin' })
   upsertFaq(@Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertFaqItemDto) {
     return this.siteContentService.upsertFaq(pageId, dto);
@@ -82,6 +85,7 @@ export class SiteContentController {
   @Delete('faq/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa FAQ admin' })
   removeFaq(@Param('id', ParseIntPipe) id: number) {
     return this.siteContentService.removeFaq(id);

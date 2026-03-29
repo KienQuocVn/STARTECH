@@ -5,6 +5,11 @@ export interface ApiClientOptions {
   headers?: HeadersInit;
 }
 
+type ApiErrorPayload = {
+  message?: string;
+  error?: string;
+}
+
 function normalizeApiBaseUrl(value: string) {
   const trimmed = value.trim().replace(/\/$/, '');
 
@@ -55,16 +60,17 @@ export class ApiClient {
         headers: { ...this.defaultHeaders, ...(init?.headers || {}) },
       });
 
-      let payload: any = null;
+      let payload: unknown = null;
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/json')) {
         payload = await response.json();
       } else {
-        payload = (await response.text()) as any;
+        payload = await response.text();
       }
 
       if (!response.ok) {
-        const message = (payload && (payload.message || payload.error)) || `HTTP ${response.status}`;
+        const errorPayload = typeof payload === 'object' && payload !== null ? (payload as ApiErrorPayload) : null;
+        const message = errorPayload?.message || errorPayload?.error || `HTTP ${response.status}`;
         throw new Error(typeof message === 'string' ? message : 'Request failed');
       }
 

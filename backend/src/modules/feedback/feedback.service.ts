@@ -5,16 +5,29 @@ import { ResponseCreateFeedbackDto, ResponseFeedbackPaginatedDto } from './dto/r
 import { plainToInstance } from 'class-transformer';
 import { StatusCodes } from 'http-status-codes';
 import { PaginationDto } from '../../shared/dto/pagination.dto';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Injectable()
 export class FeedbackService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
 
   async create(createFeedbackDto: CreateFeedbackDto): Promise<ResponseCreateFeedbackDto> {
     try {
       const result = await this.prismaService.feedback.create({
         data: createFeedbackDto,
+      });
+
+      this.businessEvents.log({
+        entity: 'feedback',
+        action: 'feedback.create',
+        entityId: result.id,
+        metadata: {
+          name: result.name,
+        },
       });
 
       // Format the response
@@ -100,6 +113,13 @@ export class FeedbackService {
       data: updateFeedbackDto,
     });
 
+    this.businessEvents.log({
+      entity: 'feedback',
+      action: 'feedback.update',
+      entityId: id,
+      metadata: updateFeedbackDto as Record<string, unknown>,
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -114,6 +134,12 @@ export class FeedbackService {
   async remove(id: number) {
     await this.prismaService.feedback.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'feedback',
+      action: 'feedback.delete',
+      entityId: id,
     });
 
     return {

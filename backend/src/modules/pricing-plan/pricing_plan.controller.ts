@@ -6,6 +6,7 @@ import { UpdatePricingPlanDto } from './dto/update-pricing_plan.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Permissions } from '../auth/permissions.decorator';
 
 @ApiTags('Pricing Plan')
 @Controller('pricing-plan')
@@ -75,6 +76,7 @@ export class PricingPlanController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('pricing.write')
   @ApiOperation({ summary: 'Tao goi gia admin' })
   create(@Body() createPricingPlanDto: CreatePricingPlanDto) {
     return this.pricingPlanService.create(createPricingPlanDto);
@@ -83,6 +85,7 @@ export class PricingPlanController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('pricing.write')
   @ApiOperation({ summary: 'Cap nhat goi gia admin' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updatePricingPlanDto: UpdatePricingPlanDto) {
     return this.pricingPlanService.update(id, updatePricingPlanDto);
@@ -91,6 +94,7 @@ export class PricingPlanController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('pricing.delete')
   @ApiOperation({ summary: 'Xoa goi gia admin' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.pricingPlanService.remove(id);

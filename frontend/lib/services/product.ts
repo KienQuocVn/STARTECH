@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api-client'
+import { getAdminAuthHeaders } from '@/lib/services/auth'
 
 export type Product = {
   id: number
@@ -63,6 +64,14 @@ const CACHE_TTL_MS = 60_000
 const responseCache = new Map<string, { data: unknown; expiresAt: number }>()
 const inFlightRequests = new Map<string, Promise<unknown>>()
 
+function clearProductCaches() {
+  for (const key of responseCache.keys()) {
+    if (key.startsWith('products:') || key.startsWith('products-by-category:') || key === 'product-categories') {
+      responseCache.delete(key)
+    }
+  }
+}
+
 async function getCached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   const now = Date.now()
   const cached = responseCache.get(key)
@@ -123,4 +132,31 @@ export async function getProductById(id: number) {
 
 export async function getProductBySlug(slug: string) {
   return apiClient.get<ItemResponse<Product>>(`/product/slug/${slug}`)
+}
+
+export async function createAdminProduct(payload: Record<string, unknown>) {
+  const response = await apiClient.post<ItemResponse<Product>, Record<string, unknown>>('/product', payload, {
+    headers: getAdminAuthHeaders(),
+  })
+  clearProductCaches()
+  return response
+}
+
+export async function updateAdminProduct(id: number, payload: Record<string, unknown>) {
+  const response = await apiClient.request<ItemResponse<Product>>(`/product/${id}`, {
+    method: 'PATCH',
+    headers: getAdminAuthHeaders(),
+    body: JSON.stringify(payload),
+  })
+  clearProductCaches()
+  return response
+}
+
+export async function deleteAdminProduct(id: number) {
+  const response = await apiClient.request<{ success: boolean; data: { id: number } }>(`/product/${id}`, {
+    method: 'DELETE',
+    headers: getAdminAuthHeaders(),
+  })
+  clearProductCaches()
+  return response
 }

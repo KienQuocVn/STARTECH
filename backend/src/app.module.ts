@@ -17,23 +17,26 @@ import { ShowcaseModule } from './modules/showcase/showcase.module';
 import { SiteContentModule } from './modules/site-content/site-content.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MediaModule } from './modules/media/media.module';
+import { SiteSettingsModule } from './modules/site-settings/site-settings.module';
+import { BusinessEventsModule } from './shared/business-events/business-events.module';
 
 @Module({
   imports: [
     // Config toàn cục
     ConfigModule.forRoot({ isGlobal: true }),
+    BusinessEventsModule,
 
     // Rate limiting — 100 req / 60s mỗi IP mặc định, contact endpoint sẽ override
     ThrottlerModule.forRoot([
       {
         name: 'default',
-        ttl: 60_000,  // 60 giây
+        ttl: 60_000, // 60 giây
         limit: 100,
       },
       {
         name: 'strict',
         ttl: 60_000,
-        limit: 10,   // Dùng cho contact form, auth endpoints
+        limit: 10, // Dùng cho contact form, auth endpoints
       },
     ]),
 
@@ -47,6 +50,7 @@ import { MediaModule } from './modules/media/media.module';
     FeedbackModule,
     ShowcaseModule,
     SiteContentModule,
+    SiteSettingsModule,
     AuthModule,
     MediaModule,
     GoogleSheetsModule,

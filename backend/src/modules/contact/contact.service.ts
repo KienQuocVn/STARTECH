@@ -3,6 +3,7 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { GoogleSheetsService } from '../../shared/google-sheet/google-sheet.service';
 import { MailService } from '../../shared/mail/mail.service';
 import { ContactStatus } from '../../global/globalEnum';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
 import { StatusCodes } from 'http-status-codes';
@@ -15,6 +16,7 @@ export class ContactService {
     private readonly prisma: PrismaService,
     private readonly sheets: GoogleSheetsService,
     private readonly mailer: MailService,
+    private readonly businessEvents: BusinessEventsService,
   ) {}
 
   async submitForm(data: CreateContactDto) {
@@ -50,6 +52,15 @@ export class ContactService {
       ]);
 
       this.logger.log(`Contact form processed successfully: ${data.email}`);
+      this.businessEvents.log({
+        entity: 'contact_submission',
+        action: 'contact.submit',
+        entityId: contact.id,
+        metadata: {
+          email: data.email,
+          service: data.service || null,
+        },
+      });
 
       return {
         success: true,
@@ -89,6 +100,15 @@ export class ContactService {
       data: { status: updateContactStatusDto.status },
     });
 
+    this.businessEvents.log({
+      entity: 'contact_submission',
+      action: 'contact.status.update',
+      entityId: id,
+      metadata: {
+        status: updateContactStatusDto.status,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -100,6 +120,12 @@ export class ContactService {
   async remove(id: number) {
     await this.prisma.contact_submission.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'contact_submission',
+      action: 'contact.delete',
+      entityId: id,
     });
 
     return {

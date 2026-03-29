@@ -7,6 +7,7 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Permissions } from '../auth/permissions.decorator';
 
 @ApiTags('Feedback')
 @Controller('feedback')
@@ -90,6 +91,7 @@ export class FeedbackController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('feedback.write')
   @ApiOperation({ summary: 'Cap nhat phan hoi admin' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateFeedbackDto: UpdateFeedbackDto) {
     return this.feedbackService.update(id, updateFeedbackDto);
@@ -98,6 +100,7 @@ export class FeedbackController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
+  @Permissions('feedback.delete')
   @ApiOperation({ summary: 'Xoa phan hoi admin' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.feedbackService.remove(id);

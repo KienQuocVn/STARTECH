@@ -17,13 +17,7 @@ export class TransformResponseInterceptor<T> implements NestInterceptor<T, ApiRe
 
     return next.handle().pipe(
       map((data) => {
-        if (
-          data !== null &&
-          typeof data === 'object' &&
-          'success' in data &&
-          'statusCode' in data &&
-          'message' in data
-        ) {
+        if (data !== null && typeof data === 'object' && 'success' in data && 'statusCode' in data && 'message' in data) {
           const typedData = data as ApiResponse<T>;
           if (typeof typedData.statusCode === 'number') {
             response.status(typedData.statusCode);

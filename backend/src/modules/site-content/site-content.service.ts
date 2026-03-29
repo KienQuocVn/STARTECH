@@ -2,18 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { StatusCodes } from 'http-status-codes';
-import {
-  CreateSitePageDto,
-  UpdateSitePageDto,
-  UpsertFaqItemDto,
-  UpsertPageSectionDto,
-} from './dto/manage-site-content.dto';
+import { CreateSitePageDto, UpdateSitePageDto, UpsertFaqItemDto, UpsertPageSectionDto } from './dto/manage-site-content.dto';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 
 @Injectable()
 export class SiteContentService {
   private readonly logger = new Logger(SiteContentService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
 
   async findPageBySlug(slug: string) {
     try {
@@ -95,6 +94,15 @@ export class SiteContentService {
       data: createSitePageDto,
     });
 
+    this.businessEvents.log({
+      entity: 'site_page',
+      action: 'content.page.create',
+      entityId: page.id,
+      metadata: {
+        slug: page.slug,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.CREATED,
@@ -109,6 +117,13 @@ export class SiteContentService {
       data: updateSitePageDto,
     });
 
+    this.businessEvents.log({
+      entity: 'site_page',
+      action: 'content.page.update',
+      entityId: page.id,
+      metadata: updateSitePageDto as Record<string, unknown>,
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -120,6 +135,12 @@ export class SiteContentService {
   async removePage(id: number) {
     await this.prisma.sitePage.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'site_page',
+      action: 'content.page.delete',
+      entityId: id,
     });
 
     return {
@@ -167,6 +188,16 @@ export class SiteContentService {
           },
         });
 
+    this.businessEvents.log({
+      entity: 'page_section',
+      action: dto.id ? 'content.section.update' : 'content.section.create',
+      entityId: section.id,
+      metadata: {
+        pageId,
+        sectionKey: section.sectionKey,
+      },
+    });
+
     return {
       success: true,
       statusCode: dto.id ? StatusCodes.OK : StatusCodes.CREATED,
@@ -178,6 +209,12 @@ export class SiteContentService {
   async removeSection(id: number) {
     await this.prisma.pageSection.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'page_section',
+      action: 'content.section.delete',
+      entityId: id,
     });
 
     return {
@@ -209,6 +246,15 @@ export class SiteContentService {
           },
         });
 
+    this.businessEvents.log({
+      entity: 'faq_item',
+      action: dto.id ? 'content.faq.update' : 'content.faq.create',
+      entityId: faq.id,
+      metadata: {
+        pageId,
+      },
+    });
+
     return {
       success: true,
       statusCode: dto.id ? StatusCodes.OK : StatusCodes.CREATED,
@@ -220,6 +266,12 @@ export class SiteContentService {
   async removeFaq(id: number) {
     await this.prisma.faqItem.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'faq_item',
+      action: 'content.faq.delete',
+      entityId: id,
     });
 
     return {

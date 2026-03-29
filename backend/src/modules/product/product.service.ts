@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { ApiPaginatedResponse, PaginationDto } from '../../shared/dto/pagination.dto';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDetailResponse, ProductResponse } from './dto/response-product.dto';
@@ -9,7 +10,10 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
 
   private readonly listProductInclude = {
     product_category: {
@@ -171,10 +175,7 @@ export class ProductService {
     }
   }
 
-  async findByCategory(
-    categoryId: number,
-    paginationDto: PaginationDto,
-  ): Promise<ApiPaginatedResponse<ProductResponse>> {
+  async findByCategory(categoryId: number, paginationDto: PaginationDto): Promise<ApiPaginatedResponse<ProductResponse>> {
     try {
       const { page = 1, limit = 10 } = paginationDto;
       const skip = (page - 1) * limit;
@@ -314,6 +315,16 @@ export class ProductService {
       include: this.detailProductInclude,
     });
 
+    this.businessEvents.log({
+      entity: 'product',
+      action: 'product.create',
+      entityId: product.id,
+      metadata: {
+        slug: product.slug,
+        name: product.name,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.CREATED,
@@ -331,16 +342,10 @@ export class ProductService {
       where: { id },
       data: {
         slug:
-          updateProductDto.slug !== undefined
-            ? updateProductDto.slug || this.buildSlug(updateProductDto.name || existing?.name || '')
-            : undefined,
+          updateProductDto.slug !== undefined ? updateProductDto.slug || this.buildSlug(updateProductDto.name || existing?.name || '') : undefined,
         name: updateProductDto.name,
         price:
-          updateProductDto.price !== undefined
-            ? updateProductDto.price != null
-              ? new Prisma.Decimal(updateProductDto.price)
-              : null
-            : undefined,
+          updateProductDto.price !== undefined ? (updateProductDto.price != null ? new Prisma.Decimal(updateProductDto.price) : null) : undefined,
         price_Type: updateProductDto.price_Type,
         rating: updateProductDto.rating !== undefined ? new Prisma.Decimal(updateProductDto.rating) : undefined,
         like: updateProductDto.like,
@@ -378,6 +383,15 @@ export class ProductService {
       include: this.detailProductInclude,
     });
 
+    this.businessEvents.log({
+      entity: 'product',
+      action: 'product.update',
+      entityId: product.id,
+      metadata: {
+        slug: product.slug,
+      },
+    });
+
     return {
       success: true,
       statusCode: StatusCodes.OK,
@@ -389,6 +403,12 @@ export class ProductService {
   async remove(id: number) {
     await this.prisma.product.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'product',
+      action: 'product.delete',
+      entityId: id,
     });
 
     return {

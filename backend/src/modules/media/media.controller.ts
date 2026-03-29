@@ -1,19 +1,10 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Permissions } from '../auth/permissions.decorator';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { MediaService } from './media.service';
@@ -40,6 +31,7 @@ export class MediaController {
 
   @Get()
   @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
+  @Permissions('media.read')
   @ApiOperation({ summary: 'Lay danh sach media assets' })
   findAll() {
     return this.mediaService.findAll();
@@ -47,6 +39,7 @@ export class MediaController {
 
   @Post('upload')
   @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('media.write')
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload media asset' })
   @UseInterceptors(
@@ -63,6 +56,7 @@ export class MediaController {
 
   @Delete(':id')
   @Roles('SUPER_ADMIN')
+  @Permissions('media.write')
   @ApiOperation({ summary: 'Xoa media asset' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.mediaService.remove(id);

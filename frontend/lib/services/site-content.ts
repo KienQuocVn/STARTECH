@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api-client'
+import { getAdminAuthHeaders } from '@/lib/services/auth'
 
 export type SiteFaqItem = {
   id: number
@@ -43,4 +44,61 @@ export type SitePageResponse = {
 
 export async function getSitePageContent(slug: string) {
   return apiClient.get<SitePageResponse>(`/site-content/page/${slug}`)
+}
+
+export async function getAdminSitePages() {
+  return apiClient.get<{ success: boolean; data: SitePageContent[] }>('/site-content', {
+    headers: getAdminAuthHeaders(),
+  })
+}
+
+export async function createAdminSitePage(payload: Record<string, unknown>) {
+  return apiClient.post<{ success: boolean; data: SitePageContent }, Record<string, unknown>>('/site-content/page', payload, {
+    headers: getAdminAuthHeaders(),
+  })
+}
+
+export async function updateAdminSitePage(id: number, payload: Record<string, unknown>) {
+  return apiClient.request<{ success: boolean; data: SitePageContent }>(`/site-content/page/${id}`, {
+    method: 'PATCH',
+    headers: getAdminAuthHeaders(),
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function deleteAdminSitePage(id: number) {
+  return apiClient.request<{ success: boolean; data: { id: number } }>(`/site-content/page/${id}`, {
+    method: 'DELETE',
+    headers: getAdminAuthHeaders(),
+  })
+}
+
+export async function upsertAdminPageSection(pageId: number, payload: Record<string, unknown>) {
+  return apiClient.post<{ success: boolean; data: SitePageSection }, Record<string, unknown>>(
+    `/site-content/page/${pageId}/section`,
+    payload,
+    {
+      headers: getAdminAuthHeaders(),
+    },
+  )
+}
+
+export async function deleteAdminPageSection(id: number) {
+  return apiClient.request<{ success: boolean; data: { id: number } }>(`/site-content/section/${id}`, {
+    method: 'DELETE',
+    headers: getAdminAuthHeaders(),
+  })
+}
+
+export async function upsertAdminFaq(pageId: number, payload: Record<string, unknown>) {
+  return apiClient.post<{ success: boolean; data: SiteFaqItem }, Record<string, unknown>>(`/site-content/page/${pageId}/faq`, payload, {
+    headers: getAdminAuthHeaders(),
+  })
+}
+
+export async function deleteAdminFaq(id: number) {
+  return apiClient.request<{ success: boolean; data: { id: number } }>(`/site-content/faq/${id}`, {
+    method: 'DELETE',
+    headers: getAdminAuthHeaders(),
+  })
 }
