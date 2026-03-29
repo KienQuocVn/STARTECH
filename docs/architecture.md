@@ -1,13 +1,4 @@
 ## 3. Backend architecture
-
-### Cap nhat
-
-- Da co permission matrix/guard de kiem soat theo capability, khong chi dung enum role thuan.
-- Da co `BusinessEventsService` ghi log business event co cau truc cho auth, contact, content, product, pricing, showcase, settings, services, feedback.
-- `site-settings` module da cho phep admin `settings` doc/ghi du lieu that tu `SiteSetting`.
-- `services` da co CRUD admin thay vi chi read-only.
-- `pricing-plan` da ho tro `featureNames` de FE co the gui feature theo ten, backend tu resolve/create khi can.
-
 ### Con thieu
 
 - Refactor nhieu service cu sang pattern exception + mapper nhat quan.

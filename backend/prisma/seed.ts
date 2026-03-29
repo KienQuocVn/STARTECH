@@ -1242,8 +1242,7 @@ async function main() {
       {
         image_url: '/img/Visa.webp',
         name: 'WEBSITE TƯ VẤN DIỆP GIA MỞ RỘNG CƠ HỘI ĐỊNH CƯ BỒ ĐÀO NHA',
-        description:
-          'Website được thiết kế đẹp mắt với nội dung gọn gàng, hình ảnh mô tả đất nước Bồ Đào Nha sống động được lồng ghép tinh tế',
+        description: 'Website được thiết kế đẹp mắt với nội dung gọn gàng, hình ảnh mô tả đất nước Bồ Đào Nha sống động được lồng ghép tinh tế',
         display_order: 7,
       },
       {
@@ -1256,22 +1255,19 @@ async function main() {
       {
         image_url: '/img/DIEN_LUC_DIEN_BIEN.webp',
         name: 'WEB EVN ĐIỆN BIÊN HỖ TRỢ NGƯỜI DÂN KỊP THỜI CÁC VẤN ĐỀ ĐIỆN LỰC',
-        description:
-          'Website thiết kế cung cấp thông tin và tin tức điện lực, kết hợp tính năng tra cứu và thanh toán hóa đơn trực tuyến',
+        description: 'Website thiết kế cung cấp thông tin và tin tức điện lực, kết hợp tính năng tra cứu và thanh toán hóa đơn trực tuyến',
         display_order: 9,
       },
       {
         image_url: '/img/DB_ACOUSTIC.webp',
         name: 'SỐNG ĐỘNG VỚI NHỮNG THIẾT BỊ ÂM THANH ĐƯỢC BÁN TẠI DB ACOUSTIC',
-        description:
-          'Trang web bán các thiết bị âm thanh trực tuyến, giao diện dễ sử dụng giúp khách hàng đặt mua thuận tiện',
+        description: 'Trang web bán các thiết bị âm thanh trực tuyến, giao diện dễ sử dụng giúp khách hàng đặt mua thuận tiện',
         display_order: 10,
       },
       {
         image_url: '/img/HELIOCARE.webp',
         name: 'NÂNG TẦM SẮC VÓC VỚI SẢN PHẨM CHĂM SÓC DA TẠI WEB HELIOCARE',
-        description:
-          'Màu sắc tươi mới, sản phẩm nổi bật, tính năng flash sale hấp dẫn thu hút nhiều khách hàng',
+        description: 'Màu sắc tươi mới, sản phẩm nổi bật, tính năng flash sale hấp dẫn thu hút nhiều khách hàng',
         display_order: 11,
       },
       {
@@ -1284,8 +1280,7 @@ async function main() {
       {
         image_url: '/img/OSAKAR.webp',
         name: 'MẪU XE ĐIỆN THÔNG MINH BÁN CHÍNH THỨC TẠI WEB OSAKAR',
-        description:
-          'Website chuyên nghiệp, tích hợp tính năng bán hàng giúp tăng hiệu quả tiếp cận khách hàng',
+        description: 'Website chuyên nghiệp, tích hợp tính năng bán hàng giúp tăng hiệu quả tiếp cận khách hàng',
         display_order: 13,
       },
       {
@@ -1524,32 +1519,29 @@ async function main() {
     });
   }
 
-  console.log('Creating dynamic site content...')
+  console.log('Creating dynamic site content...');
   const homePage = await prisma.sitePage.create({
     data: {
       slug: 'home',
-      title: 'Trang chu',
-      seoTitle: 'STARTECH - Thiet ke website, marketing va portfolio du an',
-      seoDescription:
-        'STARTECH cung cap dich vu thiet ke website, marketing, portfolio du an thuc te va giai phap phat trien thuong hieu online.',
-      heroBadge: 'Ho tro tang truong so',
-      heroTitle: 'Giai phap thiet ke website va marketing cho doanh nghiep',
-      heroDescription:
-        'Trang chu tap trung trinh bay nang luc, du an noi bat, dich vu, showcase va FAQ nham tang niem tin va chuyen doi khach hang.',
+      title: 'Trang chủ',
+      seoTitle: 'STARTECH - Thiết kế website, marketing và portfolio dự án',
+      seoDescription: 'STARTECH cung cấp dịch vụ thiết kế website, marketing, portfolio dự án thực tế và giải pháp phát triển thương hiệu online.',
+      heroBadge: 'Hỗ trợ tăng trưởng số',
+      heroTitle: 'Thiết kế mang lại cảm xúc.',
+      heroDescription: 'Trang chủ tập trung trình bày năng lực, dự án nổi bật, dịch vụ, showcase và FAQ nhằm tăng niềm tin và chuyển đổi khách hàng.',
     },
   });
 
   const websiteDesignPage = await prisma.sitePage.create({
     data: {
       slug: 'thiet-ke-website',
-      title: 'Thiet ke website',
-      seoTitle: 'Dich vu thiet ke website chuyen nghiep, chuan SEO tai STARTECH',
-      seoDescription:
-        'Dich vu thiet ke website chuyen nghiep, chuan SEO, trien khai tron goi va toi uu hieu qua kinh doanh online cho doanh nghiep.',
-      heroBadge: 'Dich vu thiet ke website',
-      heroTitle: 'Thiet ke website chuyen nghiep, chuan SEO va toi uu chuyen doi',
+      title: 'Thiết kế website',
+      seoTitle: 'Dịch vụ thiết kế website chuyên nghiệp, chuẩn SEO tại STARTECH',
+      seoDescription: 'Dịch vụ thiết kế website chuyên nghiệp, chuẩn SEO, triển khai trọn gói và tối ưu hiệu quả kinh doanh online cho doanh nghiệp.',
+      heroBadge: 'Dịch vụ thiết kế website',
+      heroTitle: 'Thiết kế website chuyên nghiệp, chuẩn SEO và tối ưu chuyển đổi',
       heroDescription:
-        'Landing page thiet ke website duoc dinh huong de gioi thieu nang luc, bang gia, quy trinh va giai dap thac mac mot cach ro rang.',
+        'Landing page thiết kế website được định hướng để giới thiệu năng lực, bảng giá, quy trình và giải đáp thắc mắc một cách rõ ràng.',
     },
   });
 
@@ -1558,17 +1550,17 @@ async function main() {
       {
         pageId: homePage.id,
         sectionKey: 'faq',
-        title: 'Cau hoi thuong gap',
-        subtitle: 'Giai dap nhanh cho khach hang quan tam ve StarTech',
-        description: 'Noi dung nay duoc dua vao database de de cap nhat va mo rong sau nay.',
+        title: 'Câu hỏi thường gặp',
+        subtitle: 'Giải đáp nhanh cho khách hàng quan tâm về StarTech',
+        description: 'Nội dung này được đưa vào database để dễ cập nhật và mở rộng sau này.',
         displayOrder: 1,
       },
       {
         pageId: websiteDesignPage.id,
         sectionKey: 'faq',
-        title: 'Ban hoi - StarTech tra loi',
-        subtitle: 'Nhung cau hoi pho bien ve dich vu thiet ke website',
-        description: 'Khoi FAQ nay la buoc dau tien trong lo trinh chuyen hardcode content sang database.',
+        title: 'Bạn hỏi - StarTech trả lời',
+        subtitle: 'Những câu hỏi phổ biến về dịch vụ thiết kế website',
+        description: 'Khối FAQ này là bước đầu tiên trong lộ trình chuyển hardcode content sang database.',
         displayOrder: 1,
       },
     ],
@@ -1578,68 +1570,72 @@ async function main() {
     data: [
       {
         pageId: homePage.id,
-        question: 'STARTECH cung cap dich vu gi?',
-        answer: 'Thiet ke website, thuong mai dien tu, phat trien ung dung va tu dong hoa marketing.',
+        question: 'STARTECH cung cấp dịch vụ gì?',
+        answer: 'Thiết kế website, thương mại điện tử, phát triển ứng dụng và tự động hóa marketing.',
         displayOrder: 1,
       },
       {
         pageId: homePage.id,
-        question: 'Thoi gian trien khai bao lau?',
-        answer: 'Tuy du an, website co ban tu 2 den 4 tuan, ecommerce hoac he thong phuc tap se can nhieu thoi gian hon.',
+        question: 'Thời gian triển khai bao lâu?',
+        answer: 'Tùy dự án, website cơ bản từ 2 đến 4 tuần, ecommerce hoặc hệ thống phức tạp sẽ cần nhiều thời gian hơn.',
         displayOrder: 2,
       },
       {
         pageId: homePage.id,
-        question: 'Co bao tri sau trien khai khong?',
-        answer: 'Co. Chung toi cung cap goi bao tri, ho tro van hanh va nang cap theo nhu cau phat trien cua doanh nghiep.',
+        question: 'Có bảo trì sau triển khai không?',
+        answer: 'Có. Chúng tôi cung cấp gói bảo trì, hỗ trợ vận hành và nâng cấp theo nhu cầu phát triển của doanh nghiệp.',
         displayOrder: 3,
       },
       {
         pageId: homePage.id,
-        question: 'Chi phi duoc tinh the nao?',
-        answer: 'Chi phi duoc xac dinh theo pham vi tinh nang, muc do tuy bien va thoi gian trien khai, luon bao gia minh bach truoc khi bat dau.',
+        question: 'Chi phí được tính thế nào?',
+        answer: 'Chi phí được xác định theo phạm vi tính năng, mức độ tùy biến và thời gian triển khai, luôn báo giá minh bạch trước khi bắt đầu.',
         displayOrder: 4,
       },
       {
         pageId: homePage.id,
-        question: 'Co ho tro nang cap mo rong khong?',
-        answer: 'Kien truc module va phuong phap trien khai giup website de mo rong theo nhu cau kinh doanh trong tuong lai.',
+        question: 'Có hỗ trợ nâng cấp mở rộng không?',
+        answer: 'Kiến trúc module và phương pháp triển khai giúp website dễ mở rộng theo nhu cầu kinh doanh trong tương lai.',
         displayOrder: 5,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Thiet ke website la gi?',
-        answer: 'Thiet ke website la qua trinh xay dung giao dien, cau truc noi dung va he thong chuc nang giup doanh nghiep gioi thieu san pham, tiep can khach hang va ban hang tren Internet.',
+        question: 'Thiết kế website là gì?',
+        answer:
+          'Thiết kế website là quá trình xây dựng giao diện, cấu trúc nội dung và hệ thống chức năng giúp doanh nghiệp giới thiệu sản phẩm, tiếp cận khách hàng và bán hàng trên Internet.',
         displayOrder: 1,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Thiet ke website chuan SEO la gi?',
-        answer: 'Website chuan SEO duoc toi uu cau truc, toc do tai trang, heading, metadata va trai nghiem nguoi dung de than thien voi cong cu tim kiem.',
+        question: 'Thiết kế website chuẩn SEO là gì?',
+        answer:
+          'Website chuẩn SEO được tối ưu cấu trúc, tốc độ tải trang, heading, metadata và trải nghiệm người dùng để thân thiện với công cụ tìm kiếm.',
         displayOrder: 2,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Tai sao doanh nghiep can website chuyen nghiep?',
-        answer: 'Website la bo mat thuong hieu online, ho tro xay dung uy tin, gioi thieu dich vu 24/7 va tang kha nang chuyen doi khach hang tiem nang.',
+        question: 'Tại sao doanh nghiệp cần website chuyên nghiệp?',
+        answer:
+          'Website là bộ mặt thương hiệu online, hỗ trợ xây dựng uy tín, giới thiệu dịch vụ 24/7 và tăng khả năng chuyển đổi khách hàng tiềm năng.',
         displayOrder: 3,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Can chuan bi gi khi lam website?',
-        answer: 'Can co thong tin doanh nghiep, logo, noi dung dich vu, cau truc trang va dinh huong muc tieu kinh doanh de trien khai nhanh va dung huong.',
+        question: 'Cần chuẩn bị gì khi làm website?',
+        answer:
+          'Cần có thông tin doanh nghiệp, logo, nội dung dịch vụ, cấu trúc trang và định hướng mục tiêu kinh doanh để triển khai nhanh và đúng hướng.',
         displayOrder: 4,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Thoi gian lam website bao lau?',
-        answer: 'Website co ban thuong tu 2 den 3 tuan, website theo yeu cau doanh nghiep co the can tu 3 den 7 tuan tuy do phuc tap.',
+        question: 'Thời gian làm website bao lâu?',
+        answer: 'Website cơ bản thường từ 2 đến 3 tuần, website theo yêu cầu doanh nghiệp có thể cần từ 3 đến 7 tuần tùy độ phức tạp.',
         displayOrder: 5,
       },
       {
         pageId: websiteDesignPage.id,
-        question: 'Chi phi thiet ke website duoc tinh nhu the nao?',
-        answer: 'Chi phi phu thuoc vao loai website, so luong trang, muc do tuy bien giao dien, tinh nang va nhu cau SEO hay noi dung di kem.',
+        question: 'Chi phí thiết kế website được tính như thế nào?',
+        answer: 'Chi phí phụ thuộc vào loại website, số lượng trang, mức độ tùy biến giao diện, tính năng và nhu cầu SEO hay nội dung đi kèm.',
         displayOrder: 6,
       },
     ],
@@ -1648,12 +1644,12 @@ async function main() {
   await prisma.siteSetting.createMany({
     data: [
       { settingKey: 'site_name', settingVal: 'STARTECH', type: 'string' },
-      { settingKey: 'site_tagline', settingVal: 'Doi moi cong nghe, toi da hieu qua', type: 'string' },
-      { settingKey: 'primary_contact_email', settingVal: 'contact@startech.local', type: 'string' },
+      { settingKey: 'site_tagline', settingVal: 'Đổi mới công nghệ, tối đa hiệu quả', type: 'string' },
+      { settingKey: 'primary_contact_email', settingVal: 'kieukienquocbusiness@gmail.com', type: 'string' },
     ],
   });
 
-  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'admin@startech.local';
+  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'kieukienquocbusiness@gmail.com';
   const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'Startech@2026';
   const passwordHash = await bcrypt.hash(defaultAdminPassword, 10);
 
@@ -1686,4 +1682,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-

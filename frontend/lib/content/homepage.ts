@@ -24,14 +24,14 @@ export type HomeServiceItem = {
 };
 
 const defaultHero: HomeHeroContent = {
-  titleLine1: 'Thiet ke mang lai cam xuc',
-  titleLine2: 'Trai nghiem nguoi dung.',
+  titleLine1: 'Thiết kế mang lại cảm xúc.',
+  titleLine2: 'Những trải nghiệm để lại ấn tượng sâu sắc.',
   description:
     'Chung toi ket hop su sang tao, cam xuc va doi moi de tao ra the gioi ky thuat so ma khan gia cua ban co the ket noi.',
-  primaryCtaLabel: 'Lien he ngay',
+  primaryCtaLabel: 'Liên hệ ngay',
   primaryCtaHref: '/lien-he',
   sideDescription:
-    'Cho du thong qua giao dien truc quan, cong nghe 3D song dong hay cach ke chuyen truc quan tao bao, chung toi thiet ke nhung khoanh khac ma moi nguoi khong chi nhin thay ma con cam nhan duoc.',
+    'Dù thông qua giao diện trực quan, hiệu ứng 3D sống động hay cách kể chuyện bằng hình ảnh táo bạo, chúng tôi thiết kế những khoảnh khắc mà mọi người không chỉ nhìn thấy mà còn cảm nhận được.',
   pills: ['UI/UX', '3D VISUALIZATION', 'DEVELOPMENT', '+'],
   scrollLabel: 'Cuon de kham pha',
 };
@@ -39,49 +39,49 @@ const defaultHero: HomeHeroContent = {
 const defaultStats: HomeStatItem[] = [
   {
     icon: '/icon/icon-khach-hang-tin-dung.png',
-    label: 'DUOC TIN TUONG BOI',
+    label: 'Được tin tưởng bởi',
     value: '100+ khach hang, doanh nghiep',
   },
   {
     icon: '/icon/icon-giao-dien.png',
-    label: 'CO SAN',
+    label: 'Có sẵn',
     value: '400+ giao dien dep, chuan SEO',
   },
   {
     icon: '/icon/icon-linh-vuc.png',
-    label: 'DAP UNG',
+    label: 'Đáp ứng',
     value: '50+ linh vuc, nganh nghe',
   },
 ];
 
 const defaultServices = {
-  eyebrow: 'Lam sao de co hang tram don hang moi ngay tu website?',
-  title: 'STARTECH giup gia tang doanh so voi SEO va Marketing',
+  eyebrow: 'Làm sao để có hàng trăm đơn hàng mới mỗi ngày từ website?',
+  title: 'STARTECH giúp gia tăng doanh số với SEO và Marketing',
   image: '/img/tang-doanh-so-ban-hang-voi-seo-marketing.png',
   items: [
     {
       icon: '/icon/icon-khach-hang-tin-dung.png',
-      title: 'Ho tro SEO manh me',
+      title: 'Hỗ trợ SEO mạnh mẽ',
       description:
-        'Toi uu cau truc, Core Web Vitals, de dang tuy chinh SEO onpage de dat thu hang cao.',
+        'Tối ưu cấu trúc, Core Web Vitals, dễ dàng tùy chỉnh SEO onpage để đạt thứ hạng cao.',
     },
     {
       icon: '/icon/icon-khach-hang-tin-dung.png',
-      title: 'Tang hieu qua quang cao',
+      title: 'Tăng hiệu quả quảng cáo',
       description:
-        'Trang dich toi uu, tich hop Google Ads va Facebook Ads giup tiep can khach hang hieu qua.',
+        'Trang đích tối ưu, tích hợp Google Ads và Facebook Ads giúp tiếp cận khách hàng hiệu quả.',
     },
     {
       icon: '/icon/icon-khach-hang-tin-dung.png',
-      title: 'Tang 30% ty le hoan tat don',
+      title: 'Tăng 30% tỷ lệ hoàn tất đơn',
       description:
-        'Abandoned checkout nhac lai gio hang, email marketing va coupon thuc day chuyen doi.',
+        'Abandoned checkout nhắc lại giỏ hàng, email marketing và coupon thúc đẩy chuyển đổi.',
     },
     {
       icon: '/icon/icon-khach-hang-tin-dung.png',
-      title: 'Do luong va phan tich',
+      title: 'Đo lường và phân tích',
       description:
-        'Bao cao du lieu khach hang va hanh vi mua sam giup toi uu chien luoc kip thoi.',
+        'Báo cáo dữ liệu khách hàng và hành vi mua sắm giúp tối ưu chiến lược kịp thời.',
     },
   ] as HomeServiceItem[],
 };
