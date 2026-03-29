@@ -115,6 +115,29 @@ export async function getProducts(params: { page?: number; limit?: number } = {}
   return getCached(`products:${path}`, () => apiClient.get<PaginatedResponse<Product>>(path))
 }
 
+export async function getAllProducts(limit = 100) {
+  const normalizedLimit = Math.min(Math.max(limit, 1), 100)
+  const allItems: Product[] = []
+  let page = 1
+  let hasNext = true
+
+  while (hasNext) {
+    const response = await getProducts({ page, limit: normalizedLimit })
+    const items = response.data?.items ?? []
+    allItems.push(...items)
+
+    hasNext = Boolean(response.data?.hasNext) && items.length > 0
+    page += 1
+
+    if (page > 50) break
+  }
+
+  return {
+    success: true,
+    data: allItems,
+  }
+}
+
 // ✅ Lấy sản phẩm theo danh mục
 export async function getProductsByCategory(catId: number, params: { page?: number; limit?: number } = {}) {
   const search = new URLSearchParams()

@@ -1,24 +1,12 @@
-# Setup
+# Setup Guide
 
-## 1. Yêu cầu môi trường
+## 1. Yeu cau moi truong
 
 - Node.js 20+
 - npm 10+
 - MySQL 8+
 
-## 2. Chạy frontend local
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend mặc định chạy:
-
-- `http://localhost:3000`
-
-## 3. Chạy backend local
+## 2. Chay backend local
 
 ```bash
 cd backend
@@ -27,25 +15,39 @@ npx prisma generate
 npx prisma migrate deploy
 npx prisma db seed
 npm run start:dev
-npx prettier --write prisma/seed.ts
 ```
 
-Backend mặc định chạy:
+Backend mac dinh:
 
 - `http://localhost:3001`
-- Swagger:
-  `http://localhost:3001/api`
+- Swagger: `http://localhost:3001/api/docs`
+- API base: `http://localhost:3001/api/v1`
+- Health: `http://localhost:3001/health`
 
-## 4. Biến môi trường backend
+## 3. Chay frontend local
 
-Tối thiểu:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend mac dinh:
+
+- `http://localhost:3000`
+
+## 4. Bien moi truong backend
+
+Toi thieu:
 
 ```env
 DATABASE_URL="mysql://user:password@host:port/database"
 PORT=3001
+JWT_SECRET=replace-with-strong-secret
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
-Khuyến nghị:
+Khuyen nghi them:
 
 ```env
 SMTP_HOST=
@@ -60,40 +62,41 @@ GOOGLE_SHEET_ID=
 GOOGLE_SERVICE_ACCOUNT_KEY_BASE64=
 ```
 
-## 5. Biến môi trường frontend
-
-Tối thiểu:
+## 5. Bien moi truong frontend
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3001
 API_BASE_URL=http://127.0.0.1:3001
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Ghi chú:
+Ghi chu:
 
-- `NEXT_PUBLIC_API_BASE_URL`
-  dùng cho client-side fetch.
-- `API_BASE_URL`
-  dùng cho server-side fetch trong Next.js.
+- `NEXT_PUBLIC_API_BASE_URL` dung cho client-side fetch.
+- `API_BASE_URL` dung cho server-side fetch trong Next.js.
+- `NEXT_PUBLIC_SITE_URL` dung de tao canonical URL, sitemap va metadata SEO.
 
-## 6. Quy trình chạy local đầy đủ
+## 6. Quy trinh chay local day du
 
-1. Khởi động MySQL.
-2. Chạy backend.
-3. Chạy frontend.
-4. Kiểm tra:
-   - frontend render đúng
-   - backend API trả dữ liệu
-   - Swagger hoạt động
-   - contact form ghi nhận dữ liệu
+1. Khoi dong MySQL.
+2. Chay backend.
+3. Chay frontend.
+4. Kiem tra:
+   - frontend render dung
+   - backend API tra du lieu
+   - `/api/docs` hoat dong
+   - `/health` hoat dong
+   - contact form gui du lieu thanh cong
+   - `/admin/portfolio` load du lieu portfolio
 
-## 7. Build production
+## 7. Build va verify truoc deploy
 
 ### Frontend
 
 ```bash
 cd frontend
 npm install
+npm test
 npm run build
 ```
 
@@ -105,82 +108,25 @@ npm install
 npm run build
 ```
 
-## 8. Gợi ý deploy production
+## 8. Luu y production
 
-### Frontend
+- Cap nhat `CORS_ORIGINS` bang domain production that.
+- Dat `JWT_SECRET` manh, khong dung gia tri mac dinh.
+- Dat `NEXT_PUBLIC_SITE_URL` dung domain public.
+- Cau hinh reverse proxy HTTPS.
+- Bat backup database va log monitoring.
+- Dua static asset nang nhu `.spline` len CDN neu traffic lon.
 
-Có thể deploy lên:
+## 9. Kiem tra sau deploy
 
-- Vercel
-- VPS Node.js
-- Docker + reverse proxy
+- Trang chu, dich vu, du an, lien he, gioi thieu load duoc tren mobile va desktop.
+- `robots.txt` va `sitemap.xml` tra ve dung.
+- Metadata title, description, canonical, Open Graph hien thi dung.
+- Admin login, CRUD portfolio, content, showcase hoat dong.
+- Contact form, feedback, showcase va API health on dinh.
 
-### Backend
+## 10. Tai lieu lien quan
 
-Có thể deploy lên:
-
-- VPS
-- Railway
-- Render
-- Fly.io
-- Docker container
-
-### Database
-
-Phù hợp:
-
-- Aiven MySQL
-- PlanetScale
-- VPS MySQL riêng
-
-## 9. File 3D Spline deploy ở đâu?
-
-Hiện tại project có các file:
-
-- `frontend/public/3D/startech.spline`
-- `frontend/public/3D/startech_reponsive.spline`
-- `frontend/public/3D/laptop.spline`
-- `frontend/public/3D/laptop_responsive.spline`
-
-Khi deploy frontend, các file này sẽ được phục vụ như static asset.
-
-Ví dụ:
-
-- `frontend/public/3D/laptop.spline`
-  sẽ có URL:
-  `https://your-domain.com/3D/laptop.spline`
-
-### Khuyến nghị tối ưu tốc độ tải
-
-Giai đoạn hiện tại:
-
-- vẫn để file trong `frontend/public/3D`
-- deploy cùng frontend để đơn giản hóa
-
-Giai đoạn production tối ưu hơn:
-
-- chuyển file `.spline` sang CDN/object storage
-- ví dụ:
-  - Cloudflare R2
-  - AWS S3 + CloudFront
-  - BunnyCDN
-
-Lợi ích:
-
-- tải nhanh hơn do edge cache
-- giảm tải cho server frontend
-- dễ version asset 3D
-
-### Best practice cho Spline
-
-- Tạo riêng scene cho mobile và desktop như hiện tại là đúng hướng.
-- Giảm texture và chi tiết thừa trong file 3D.
-- Lazy load component 3D khi vào viewport.
-- Không để nhiều scene 3D tải cùng lúc trên một trang.
-- Bật cache-control dài hạn cho asset `.spline`.
-
-## 10. Ghi chú vận hành
-
-- Backend hiện hardcode CORS local trong `backend/src/main.ts`, cần cập nhật trước khi deploy production.
-- Nên bổ sung `.env.example` cho cả frontend và backend.
-- Nên có CI/CD build check trước khi release.
+- `docs/public-deploy-audit.md`
+- `docs/architecture.md`
+- `docs/database.md`

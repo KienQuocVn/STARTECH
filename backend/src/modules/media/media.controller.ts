@@ -22,6 +22,17 @@ function buildFileName(_: unknown, file: UploadedMediaFile, callback: (error: Er
   callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
 }
 
+function fileFilter(_: unknown, file: UploadedMediaFile, callback: (error: Error | null, acceptFile: boolean) => void) {
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    callback(new Error('Chi cho phep upload hinh anh JPG, PNG, WEBP, GIF hoac SVG.'), false);
+    return;
+  }
+
+  callback(null, true);
+}
+
 @ApiTags('Media')
 @ApiBearerAuth()
 @Controller('media')
@@ -48,6 +59,10 @@ export class MediaController {
         destination: 'uploads',
         filename: buildFileName,
       }),
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+      fileFilter,
     }),
   )
   upload(@UploadedFile() file: UploadedMediaFile) {
