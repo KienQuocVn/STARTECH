@@ -16,6 +16,16 @@ Tai lieu nay tong hop:
 - Sua loi `admin/portfolio` khong load du lieu do frontend gui `limit=200` trong khi backend chi chap nhan toi da `100`.
 - Them helper lay toan bo portfolio theo nhieu trang de admin va sitemap khong bi gioi han 100 item.
 - Sua `sitemap.xml` de lay du lieu portfolio an toan, khong bi `400` validation.
+- Bo `eslint.ignoreDuringBuilds` va `typescript.ignoreBuildErrors` khoi `frontend/next.config.mjs` de frontend quay lai build theo loi that.
+- Chuyen login/logout admin sang session flow qua `frontend/app/api/admin/session/route.ts`, set cookie thay vi ghi token vao `localStorage`.
+- Cap nhat backend `JwtStrategy` de nhan JWT tu cookie `startech_admin_token`, khong chi tu header Bearer.
+- Bo sung `Content-Security-Policy` co ban trong `frontend/middleware.ts`.
+- Tao component dung chung `ConversionBand` va gan vao `trang-chu`, `dich-vu`, `du-an` de CTA "Nhan bao gia" / "Dat lich tu van" va trust signal nhat quan hon.
+- Chuan hoa them token brand trong `frontend/app/globals.css` gom:
+  - `--brand-primary`
+  - `--brand-secondary`
+  - `--brand-surface`
+  - `--brand-gradient`
 - Tao skeleton loading moi cho cac route co `loading.tsx` va ap dung `animate-pulse`.
 - Dong bo palette xanh duong theo 2 mau chu dao:
   - `#1a63a8`
@@ -27,23 +37,22 @@ Tai lieu nay tong hop:
 
 ### Da verify
 
-- Frontend SEO tests: `PASS`
-- Backend build: `PASS`
-- Frontend production build: `PASS`
+- Frontend lint: `PASS` nhung con warning ve `img`, `alt`, va mot so bien chua dung.
+- Backend build: `BLOCKED`
+  - Khong fail vi TypeScript hien tai.
+  - Bi chan boi loi Windows `EPERM` khi `rimraf dist\\tsconfig.build.tsbuildinfo`.
+- Frontend production build: `CHUA VERIFY XONG`
+  - Da bat lai build check that.
+  - Lenh build bi dung giua chung khi dang chay, nen chua co ket qua cuoi cung cho dot nay.
 
 ### Luu y quan trong
 
-Frontend van dang build voi:
+Frontend da duoc tra ve che do build nghiem tuc hon:
 
-- bo qua type validation
-- bo qua linting
+- khong con `eslint.ignoreDuringBuilds`
+- khong con `typescript.ignoreBuildErrors`
 
-Do `frontend/next.config.mjs` dang bat:
-
-- `eslint.ignoreDuringBuilds = true`
-- `typescript.ignoreBuildErrors = true`
-
-Day la diem can xu ly truoc khi xem la "production-ready" theo nghia chat luong code.
+Tuy nhien dot nay moi verify duoc `lint`, chua chot xong ket qua `frontend build`, va van con nhom warning can don tiep neu muon chat luong production sach hon.
 
 ## 3. Danh gia hien trang
 
@@ -59,10 +68,9 @@ Diem on:
 
 Diem chua on:
 
-- Visual language chua dong nhat 100%, vi mot so section van dung tone teal/cu va mot so section dung xanh duong moi.
-- Nhieu component dang hardcode mau truc tiep trong JSX, ve sau se kho maintain.
-- Motion va gradient co nhieu phong cach khac nhau giua cac trang, can chuan hoa them de nhin "mot thuong hieu".
-- Admin UI truoc do co dung class `brand-*` nhung chua co token trung tam, da duoc bo sung trong dot nay.
+- Da co them brand token va mot block CTA/trust dung chung, nhung van con mot so section public dung mau hardcode / tone teal cu.
+- Motion va gradient da bot roi rac hon, nhung van chua duoc chuan hoa toan bo tren moi trang.
+- Chua refactor het nhom component cu sang design token moi, nen tinh dong nhat thuong hieu moi o muc "mot phan".
 
 ### Than thien nguoi dung va de su dung
 
@@ -77,9 +85,9 @@ Diem on:
 
 Diem can cai thien:
 
-- Can bo sung CTA "Nhan bao gia" / "Dat lich tu van" nhat quan hon o cuoi cac section quan trong.
-- Can co trust signal manh hon: quy trinh, cam ket, SLA, bao hanh, doi tac, logo khach hang that.
-- Can toi uu microcopy o mot so noi dung de ngan gon va tap trung vao loi ich kinh doanh hon.
+- Da bo sung CTA "Nhan bao gia" / "Dat lich tu van" va trust signal co ban tren `trang-chu`, `dich-vu`, `du-an`.
+- Van can tiep tuc day social proof that hon nhu logo khach hang, doi tac, case study co so lieu that.
+- Microcopy da duoc lam gon hon o block conversion moi, nhung cac section cu van con can chinh lai them.
 
 ### Responsive
 
@@ -127,7 +135,7 @@ Diem thieu:
 - Chua thay quy trinh audit Core Web Vitals that.
 - Chua thay kiem soat chat heading hierarchy tren toan bo page.
 - Chua co quy trinh anh SEO dong bo: kich thuoc, alt text, preload/prioritize anh quan trong.
-- Frontend dang bo qua type-check va lint trong build, de sot loi SEO/runtime.
+- Frontend khong con bo qua type-check/lint trong build, nhung van con warning can xu ly de chat luong SEO/runtime sach hon.
 
 ### Bao mat va kha nang chong tan cong
 
@@ -145,8 +153,8 @@ Diem on:
 
 Rui ro chua xu ly xong:
 
-- Access token admin dang luu trong `localStorage`, de bi rui ro neu xay ra XSS.
-- Chua thay CSP policy day du.
+- Luong auth admin da duoc doi sang cookie-based session flow trong code, nhung can verify them e2e toan bo CRUD admin sau khi restart app.
+- Da co CSP co ban, nhung chua phai CSP hardening day du cho moi script/asset third-party.
 - Chua thay WAF/CDN/chong bot o tang public edge.
 - Chua thay backup/restore test chinh thuc.
 - Chua thay monitoring, alerting, log dashboard, audit trail hoan chinh.
@@ -154,29 +162,29 @@ Rui ro chua xu ly xong:
 
 Ket luan bao mat:
 
-- Khong co dau hieu "mo toang" hay rat de bi hack ngay lap tuc.
-- Tuy nhien chua the cam ket "khong bi hacker danh cap du lieu" hoac "khong bi DDoS" neu chua co cac lop bao ve ha tang nhu CDN, WAF, rate-limit edge, backup, monitoring, secret rotation.
+- Muc do hardening da tot hon so voi truoc nho session cookie va CSP co ban.
+- Tuy nhien van chua the cam ket muc "an toan cao" neu chua co verify e2e auth, CSP day du, CDN/WAF, backup, monitoring va quy trinh van hanh su co.
 
 ## 4. Danh sach task de public gan
 
 ### P0 - Bat buoc truoc khi public
 
-1. Bo type-ignore va lint-ignore trong `frontend/next.config.mjs`.
-   Muc tieu: build fail khi code loi that, tranh deploy code loi len production.
+1. Chay lai verify day du sau khi restart app:
+   - frontend production build
+   - backend build sau khi giai phong file `dist\\tsconfig.build.tsbuildinfo`
+   - login/admin CRUD e2e voi luong cookie moi
+   Muc tieu: xac nhan nhung thay doi da on dinh that, khong chi dung o muc sua code.
 
-2. Chuyen admin auth tu `localStorage` sang `httpOnly secure cookie`.
-   Muc tieu: giam rui ro token bi lay qua XSS.
-
-3. Chuan hoa env production.
+2. Chuan hoa env production.
    Muc tieu: dat `JWT_SECRET`, `CORS_ORIGINS`, `NEXT_PUBLIC_SITE_URL`, SMTP, DB secret dung chuan.
 
-4. Dung CDN/WAF truoc frontend va backend.
+3. Dung CDN/WAF truoc frontend va backend.
    Muc tieu: giam rui ro DDoS, bot spam, abuse traffic.
 
-5. Thiet lap backup database va quy trinh restore.
+4. Thiet lap backup database va quy trinh restore.
    Muc tieu: khong mat du lieu khi co su co.
 
-6. Test responsive that tren:
+5. Test responsive that tren:
    - iPhone SE / 390px
    - iPhone Pro Max
    - iPad / iPad Pro
@@ -192,14 +200,14 @@ Ket luan bao mat:
 2. Audit anh va asset 3D.
    Muc tieu: giam dung luong, cai thien LCP/CLS/INP tren mobile.
 
-3. Bo sung CSP va security review cho upload, auth, admin routes.
-   Muc tieu: tang hardening muc ung dung.
+3. Mo rong CSP va security review cho upload, auth, admin routes.
+   Muc tieu: tang hardening muc ung dung sau khi da co lop CSP co ban.
 
 4. Bo sung analytics + monitoring + alerting.
    Muc tieu: biet ngay khi site loi, API loi, lead form loi.
 
 5. Them social proof that va CTA conversion ro hon.
-   Muc tieu: tang ti le lien he/bao gia.
+   Muc tieu: tang ti le lien he/bao gia, bo sung case study / logo khach hang / cam ket ro hon.
 
 ### P2 - Nang cap gan
 
@@ -244,4 +252,4 @@ Ket luan bao mat:
 
 ## 6. Ket luan ngan
 
-Du an hien tai da co nen tang kha tot de demo va tien toi public, dac biet sau khi da sua loi portfolio, sitemap, loading skeleton va bo sung mot so hardening co ban. Tuy nhien de tu tin public cho khach hang vao xem o muc "san sang van hanh", van con mot nhom viec P0 lien quan den type/lint enforcement, auth storage, WAF/CDN, backup va test responsive thuc te can hoan tat.
+Du an hien tai da tot hon mot buoc nua o 3 nhom viec chinh: sua portfolio/sitemap, bat build gate that, va chuyen session admin sang cookie-based flow kem CTA/trust band dung chung cho cac trang public. Tuy nhien de xem la "san sang van hanh", van can mot vong verify lai build + auth e2e, sau do xu ly tiep WAF/CDN, backup va test responsive thuc te.

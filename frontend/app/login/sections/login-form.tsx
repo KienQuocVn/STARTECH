@@ -30,16 +30,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     setError(null);
 
     try {
-      const response = await loginAdmin(email, password);
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('startech_admin_token', response.data.accessToken);
-        localStorage.setItem('startech_admin_refresh_token', response.data.refreshToken);
-        localStorage.setItem('startech_admin_user', JSON.stringify(response.data.user));
-        document.cookie = `startech_admin_token=${response.data.accessToken}; path=/; max-age=${60 * 60 * 12}; samesite=lax`;
-      }
-
+      await loginAdmin(email, password);
       router.push('/admin');
+      router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Dang nhap that bai.');
     } finally {
@@ -122,7 +115,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 Mat khau: <span className="font-mono text-slate-900">Startech@2026</span>
               </p>
               <p className="mt-2 text-xs text-slate-500">
-                Ban co the doi bang `ADMIN_EMAIL` va `ADMIN_PASSWORD` khi chay seed.
+                Phien dang nhap admin hien duoc luu bang cookie an toan hon thay vi `localStorage`.
               </p>
             </div>
           </form>

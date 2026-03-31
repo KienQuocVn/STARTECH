@@ -1,8 +1,10 @@
 'use client';
 
+import { useTransition } from 'react';
 import { usePathname } from 'next/navigation';
 import { Bell, LogOut, Menu, User } from 'lucide-react';
 import { useAdminStore } from '@/lib/store';
+import { logoutAdmin } from '@/lib/services/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,13 +29,13 @@ const breadcrumbs: Record<string, string[]> = {
 export function TopBar() {
   const pathname = usePathname();
   const { toggleSidebar } = useAdminStore();
+  const [isPending, startTransition] = useTransition();
 
   function handleLogout() {
-    localStorage.removeItem('startech_admin_token');
-    localStorage.removeItem('startech_admin_refresh_token');
-    localStorage.removeItem('startech_admin_user');
-    document.cookie = 'startech_admin_token=; path=/; max-age=0; samesite=lax';
-    window.location.href = '/login';
+    startTransition(async () => {
+      await logoutAdmin().catch(() => null);
+      window.location.href = '/login';
+    });
   }
 
   const crumbs =
@@ -79,9 +81,9 @@ export function TopBar() {
             </DropdownMenuItem>
             <DropdownMenuItem>Thiet lap tai khoan</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex items-center gap-2 text-red-600" onClick={handleLogout}>
+            <DropdownMenuItem className="flex items-center gap-2 text-red-600" onClick={handleLogout} disabled={isPending}>
               <LogOut size={16} />
-              <span>Dang xuat</span>
+              <span>{isPending ? 'Dang xu ly...' : 'Dang xuat'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

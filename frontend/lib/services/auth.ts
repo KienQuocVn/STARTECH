@@ -50,31 +50,37 @@ export type LoginResponse = {
 };
 
 export async function loginAdmin(email: string, password: string) {
-  return apiClient.post<LoginResponse, { email: string; password: string }>('/auth/login', {
-    email,
-    password,
+  const response = await fetch('/api/admin/session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const payload = (await response.json().catch(() => null)) as LoginResponse | { message?: string } | null;
+
+  if (!response.ok) {
+    throw new Error(payload && 'message' in payload && typeof payload.message === 'string' ? payload.message : 'Dang nhap that bai.');
+  }
+
+  return payload as LoginResponse;
+}
+
+export async function logoutAdmin() {
+  await fetch('/api/admin/session', {
+    method: 'DELETE',
   });
 }
 
-export async function getAdminProfile(accessToken: string) {
-  return apiClient.get<{ success: boolean; data: AuthUser }>('/auth/me', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+export async function getAdminProfile() {
+  return apiClient.get<{ success: boolean; data: AuthUser }>('/auth/me');
 }
 
 export function getAdminAccessToken() {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('startech_admin_token');
+  return null;
 }
 
 export function getAdminAuthHeaders() {
-  const token = getAdminAccessToken();
-
-  if (!token) return undefined;
-
-  return {
-    Authorization: `Bearer ${token}`,
-  } satisfies Record<string, string>;
+  return undefined;
 }

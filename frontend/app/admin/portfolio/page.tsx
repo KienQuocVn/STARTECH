@@ -12,8 +12,8 @@ import { Card } from '@/components/ui/card'
 import {
   createAdminProduct,
   deleteAdminProduct,
+  getAllProducts,
   getProductCategories,
-  getProducts,
   updateAdminProduct,
   type Product,
   type ProductCategory,
@@ -35,13 +35,13 @@ export default function PortfolioPage() {
 
   const loadData = async () => {
     const [productsResponse, categoriesResponse, servicesResponse, showcaseResponse] = await Promise.all([
-      getProducts({ page: 1, limit: 200 }),
+      getAllProducts(),
       getProductCategories(),
       getServicesCatalog(),
       getShowcaseItems().catch(() => ({ data: [] })),
     ])
 
-    setProjects(productsResponse.data?.items ?? [])
+    setProjects(productsResponse.data ?? [])
     setCategories(categoriesResponse.data ?? [])
     setServices(servicesResponse.data ?? [])
     setShowcaseNames((showcaseResponse.data ?? []).map((item) => item.name))

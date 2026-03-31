@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -17,6 +17,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import { logoutAdmin } from '@/lib/services/auth';
 import { useAdminStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
@@ -35,13 +36,13 @@ export function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar } = useAdminStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   function handleLogout() {
-    localStorage.removeItem('startech_admin_token');
-    localStorage.removeItem('startech_admin_refresh_token');
-    localStorage.removeItem('startech_admin_user');
-    document.cookie = 'startech_admin_token=; path=/; max-age=0; samesite=lax';
-    window.location.href = '/login';
+    startTransition(async () => {
+      await logoutAdmin().catch(() => null);
+      window.location.href = '/login';
+    });
   }
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
@@ -114,10 +115,11 @@ export function Sidebar() {
           </a>
           <button
             onClick={handleLogout}
+            disabled={isPending}
             className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray transition-all hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut size={20} />
-            {!sidebarCollapsed && 'Dang xuat'}
+            {!sidebarCollapsed && (isPending ? 'Dang xu ly...' : 'Dang xuat')}
           </button>
         </div>
       </aside>

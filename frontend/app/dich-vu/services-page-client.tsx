@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { ConversionBand } from '@/components/site/conversion-band';
 import { useGsapReveal } from '@/hooks/use-gsap-reveal';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -123,6 +124,11 @@ export default function ServicesPageClient() {
       <WhyChooseSimple />
       <ServicesGridSection />
       <ProcessSection />
+      <ConversionBand
+        eyebrow="Tang trust va lead"
+        title="Dat lich tu van de nhan de xuat dich vu, timeline va cam ket van hanh"
+        description="Tu website gioi thieu, landing page den he thong noi dung dai han, chung toi giup doanh nghiep chon goi phu hop va tranh dau tu dan trai khong ro KPI."
+      />
       <CtaSection />
     </div>
   );

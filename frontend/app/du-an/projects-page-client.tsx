@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { ConversionBand } from '@/components/site/conversion-band';
 import { useGsapReveal } from '@/hooks/use-gsap-reveal';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -233,6 +234,11 @@ export default function ProjectsPageClient({
         totalPages={totalPages}
         totalItems={totalItems}
         totalAllItems={totalAllItems}
+      />
+      <ConversionBand
+        eyebrow="Tu portfolio den du an cua ban"
+        title="Dat lich tu van de nhan mockup, chi phi du kien va goc nhin phu hop nganh hang"
+        description="Neu ban da xem portfolio va muon biet mau website nao hop voi doanh nghiep cua minh, STARTECH se de xuat huong giao dien, stack va cach trien khai de de van hanh ve sau."
       />
       <FeedbackSection />
       <CTASection />

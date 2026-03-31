@@ -7,6 +7,7 @@ import { Portfolio } from '@/app/trang-chu/sections/portfolio';
 import { Services } from '@/app/trang-chu/sections/services';
 import { Stats } from '@/app/trang-chu/sections/stats';
 import { WebsiteShowcase } from '@/app/trang-chu/sections/website-showcase';
+import { ConversionBand } from '@/components/site/conversion-band';
 import { useGsapReveal } from '@/hooks/use-gsap-reveal';
 import type { HomeHeroContent, HomeServiceItem, HomeStatItem } from '@/lib/content/homepage';
 import type { Product, ProductCategory } from '@/lib/services/product';
@@ -46,6 +47,11 @@ export default function HomePageClient({
       <Portfolio
         initialProducts={initialPortfolioProducts}
         initialCategories={initialPortfolioCategories}
+      />
+      <ConversionBand
+        eyebrow="San sang chuyen doi"
+        title="Nhan bao gia va lo trinh trien khai ro rang truoc khi bat dau"
+        description="STARTECH tap trung vao bai toan kinh doanh cu the: website can hut lead gi, can xay trust ra sao va can van hanh nhu the nao de doi ngu ban hang de tiep tuc su dung."
       />
       <FAQ items={initialFaqs} />
     </div>
