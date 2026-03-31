@@ -44,9 +44,9 @@ export class ContactService {
           data.message,
           ContactStatus.WAITING,
         ]),
-        this.mailer.sendMail(data.email, 'Cam on ban da lien he voi StarTech!', 'contact', {
+        this.mailer.sendMail(data.email, 'Cảm ơn bạn đã liên hệ với StarTech!', 'contact', {
           name: data.name,
-          service: data.service || 'Tu van tong quan',
+          service: data.service || 'Tư vấn tổng quan',
           message: data.message,
         }),
       ]);
@@ -64,7 +64,7 @@ export class ContactService {
 
       return {
         success: true,
-        message: 'Lien he thanh cong!',
+        message: 'Liên hệ thành công!',
         status: ContactStatus.WAITING,
         data: {
           id: contact.id,
@@ -75,7 +75,7 @@ export class ContactService {
       this.logger.error('Failed to process contact form', error);
       throw new InternalServerErrorException({
         success: false,
-        message: 'Co loi xay ra. Vui long thu lai sau.',
+        message: 'Có lỗi xảy ra. Vui lòng thử lại sau.',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });
     }
@@ -89,7 +89,7 @@ export class ContactService {
     return {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Lay danh sach lead thanh cong.',
+      message: 'Lấy danh sách lead thành công.',
       data: items,
     };
   }
@@ -112,7 +112,7 @@ export class ContactService {
     return {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Cap nhat trang thai lead thanh cong.',
+      message: 'Cập nhật trạng thái lead thành công.',
       data: contact,
     };
   }
@@ -131,7 +131,7 @@ export class ContactService {
     return {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Xoa lead thanh cong.',
+      message: 'Xóa lead thành công.',
       data: { id },
     };
   }

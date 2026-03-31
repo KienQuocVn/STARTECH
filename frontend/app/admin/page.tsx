@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { FileText, FolderOpen, MessageCircle, Users } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowRight, FileText, FolderOpen, MessageCircle, Star, Users } from 'lucide-react'
 import {
   Bar,
   BarChart,
@@ -108,11 +109,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-1 text-gray-600">Tong quan he thong admin dang lay tu backend</p>
-      </div>
-
       {error ? <Card className="p-4 text-sm text-red-600">{error}</Card> : null}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -122,9 +118,15 @@ export default function DashboardPage() {
         <KPICard label="CMS Pages" value={data.pages.length} icon={<FileText size={24} />} color="amber" />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">Leads va du an theo thang</h2>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.8fr)]">
+        <Card className="rounded-[28px] border-slate-200 p-6 shadow-lg shadow-slate-200/60">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-950">Leads va du an theo thang</h2>
+              <p className="mt-1 text-sm text-slate-500">Du lieu tong hop tu backend theo nam hien tai</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Yearly</div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={monthlyChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -138,27 +140,68 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">Leads gan day</h2>
-          <div className="space-y-3">
-            {recentLeads.length > 0 ? (
-              recentLeads.map((lead) => (
-                <div key={lead.id} className="rounded-lg border border-gray-200 p-3">
-                  <div className="mb-1 flex items-start justify-between gap-3">
-                    <span className="font-semibold text-gray-900">{lead.name}</span>
-                    <StatusBadge
-                      status={lead.status === 'WAITING' ? 'new' : lead.status === 'VIEWED' ? 'processing' : 'completed'}
-                    />
+        <div className="space-y-6">
+          <Card className="rounded-[28px] border-slate-200 p-6 shadow-lg shadow-slate-200/60">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-950">Leads gan day</h2>
+                <p className="mt-1 text-sm text-slate-500">Danh sach lead moi nhat can theo doi</p>
+              </div>
+              <Link href="/admin/leads" className="inline-flex items-center gap-2 text-sm font-medium text-blue-600">
+                Xem tat ca
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+            <div className="mt-5 space-y-3">
+              {recentLeads.length > 0 ? (
+                recentLeads.map((lead) => (
+                  <div key={lead.id} className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4">
+                    <div className="mb-2 flex items-start justify-between gap-3">
+                      <span className="font-semibold text-slate-950">{lead.name}</span>
+                      <StatusBadge
+                        status={lead.status === 'WAITING' ? 'new' : lead.status === 'VIEWED' ? 'processing' : 'completed'}
+                      />
+                    </div>
+                    <p className="text-sm text-slate-600">{lead.service || 'Tu van tong quan'}</p>
+                    <p className="mt-2 text-xs text-slate-500">{new Date(lead.createdAt).toLocaleString('vi-VN')}</p>
                   </div>
-                  <p className="text-sm text-gray-600">{lead.service || 'Tu van tong quan'}</p>
-                  <p className="mt-1 text-xs text-gray-500">{new Date(lead.createdAt).toLocaleString('vi-VN')}</p>
+                ))
+              ) : (
+                <p className="text-sm text-slate-600">{isLoading ? 'Dang tai du lieu...' : 'Chua co lead tu backend.'}</p>
+              )}
+            </div>
+          </Card>
+
+          <Card className="rounded-[28px] border-slate-200 p-6 shadow-lg shadow-slate-200/60">
+            <h2 className="text-lg font-semibold text-slate-950">Nhanh trong ngay</h2>
+            <div className="mt-5 space-y-4">
+              <div className="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-white p-2 text-amber-500">
+                    <Star size={18} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-950">Feedback hien co</p>
+                    <p className="text-sm text-slate-500">Danh gia cua khach hang</p>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-600">{isLoading ? 'Dang tai du lieu...' : 'Chua co lead tu backend.'}</p>
-            )}
-          </div>
-        </Card>
+                <span className="text-2xl font-semibold text-slate-950">{data.feedbackCount}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-white p-2 text-emerald-500">
+                    <MessageCircle size={18} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-950">Lead chua doc</p>
+                    <p className="text-sm text-slate-500">Can xu ly uu tien</p>
+                  </div>
+                </div>
+                <span className="text-2xl font-semibold text-slate-950">{newLeadsCount}</span>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   )

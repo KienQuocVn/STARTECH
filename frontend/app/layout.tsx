@@ -2,15 +2,10 @@ import type React from 'react';
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { Montserrat } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/next';
 import { Suspense } from 'react';
-import { Footer } from '@/components/footer';
-import GlobalFX from '@/components/global-fx';
+import { AppShell } from '@/components/app-shell';
 import { GlobalLoader } from '@/components/global-loader';
-import { Navbar } from '@/components/navbar';
-import { SchemaScript } from '@/components/schema-script';
-import { SocialSidebar } from '@/components/social-sidebar';
-import { buildLocalBusinessSchema, getSiteUrl } from '@/lib/seo';
+import { getSiteUrl } from '@/lib/seo';
 import './globals.css';
 
 const montserrat = Montserrat({
@@ -70,14 +65,8 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning className={`${GeistSans.variable} ${montserrat.variable}`}>
       <body className="bg-white font-sans antialiased">
-        <SchemaScript data={buildLocalBusinessSchema()} />
         <Suspense fallback={<GlobalLoader />}>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <SocialSidebar />
-          <Analytics />
-          <GlobalFX />
+          <AppShell>{children}</AppShell>
         </Suspense>
       </body>
     </html>

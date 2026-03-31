@@ -24,11 +24,18 @@
 
 ### Dang tiep tuc
 
-- [ ] Production deploy docs.
+- [~] Production deploy docs.
+  Da co `docs/public-deploy-audit.md` va checklist deploy co ban.
+  Van can bo sung tai lieu env production, rollback, WAF/CDN, va cach tat/gioi han Swagger khi public.
 - [ ] CDN/caching strategy cho asset nang va `.spline`.
 - [~] Monitoring, backup, alerting.
   Da co `/health` cho backend, `/api/health` cho frontend va `BusinessEventsService` de lam baseline smoke/uptime/business log.
   Alerting, dashboard observability, backup va on-call production van chua duoc thiet lap.
+- [~] Build verification.
+  Frontend production build, frontend SEO metadata test va backend build da chay duoc.
+  Van can don warning frontend (`img`, `alt`, bien khong dung) va bo sung auth/admin e2e smoke test.
+- [ ] Production security cleanup.
+  Can loai bo seed credentials khoi login UI, bo fallback `JWT_SECRET` / admin password trong production path, va dong hoac gioi han `/api/docs`.
 
 ### Ghi chu kiem chung
 

@@ -1,59 +1,42 @@
-import Image from "next/image";
-import { CheckCircle2 } from "lucide-react";
+import Image from 'next/image'
+import { CheckCircle2 } from 'lucide-react'
 
-export function AboutSection() {
-  const highlights = [
-    "Đội ngũ chuyên gia giàu kinh nghiệm",
-    "Công nghệ hiện đại, tiên tiến",
-    "Giải pháp tùy chỉnh theo nhu cầu",
-    "Hỗ trợ 24/7",
-    "Bảo mật thông tin tuyệt đối",
-    "Chi phí hợp lý, hiệu quả cao",
-  ];
-
+export function AboutSection({
+  content,
+}: {
+  content: {
+    title: string
+    imageUrl: string
+    buttonLabel: string
+    items: string[]
+  }
+}) {
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
+    <section className="bg-gray-50 py-16 md:py-24">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* LEFT CONTENT */}
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="space-y-6 text-center lg:text-left">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-800 leading-tight">
-              VÌ SAO NÊN CHỌN<br />
-              LÀM VIỆC - SÁNG TẠO VỚI<br />
-              <span className="text-[#1a63a8]">STARTECH?</span>
-            </h2>
+            <h2 className="text-3xl font-semibold leading-tight text-gray-800 md:text-4xl lg:text-5xl">{content.title}</h2>
 
             <div className="space-y-4">
-              {highlights.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-3 justify-center lg:justify-start"
-                >
-                  <CheckCircle2 className="w-6 h-6 text-[#1a63a8] flex-shrink-0 mt-1" />
-                  <p className="text-gray-700 text-base md:text-lg">{item}</p>
+              {content.items.map((item) => (
+                <div key={item} className="flex items-start justify-center gap-3 lg:justify-start">
+                  <CheckCircle2 className="mt-1 h-6 w-6 flex-shrink-0 text-[#1a63a8]" />
+                  <p className="text-base text-gray-700 md:text-lg">{item}</p>
                 </div>
               ))}
             </div>
 
-            <button className="mt-6 bg-gradient-to-r from-[#80d8f9] to-[#1a63a8] text-white px-8 py-3 rounded-full hover:bg-teal-600 transition-all duration-200 shadow-md">
-              Tìm hiểu thêm
-            </button>
+            <a href="/lien-he" className="mt-6 inline-block rounded-full bg-gradient-to-r from-[#80d8f9] to-[#1a63a8] px-8 py-3 text-white shadow-md transition-all duration-200">
+              {content.buttonLabel}
+            </a>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="relative w-full h-64 sm:h-80 md:h-[420px] lg:h-[480px]">
-            <Image
-              src="/img/professional-web-design-team.jpg"
-              alt="Thiết kế website giới thiệu sản phẩm đẹp, chuyên nghiệp"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-              className="object-contain md:object-cover object-center rounded-xl shadow-lg"
-              quality={90}
-            />
+          <div className="relative h-64 w-full sm:h-80 md:h-[420px] lg:h-[480px]">
+            <Image src={content.imageUrl} alt={content.title} fill priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw" className="rounded-xl object-contain object-center shadow-lg md:object-cover" quality={90} />
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

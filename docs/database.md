@@ -10,5 +10,5 @@ Tai khoan admin seed:
 
 - Email: `admin@startech.local`
 - Password: `Startech@2026`
-
+npx prettier --write prisma/seed.ts
 ---

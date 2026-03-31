@@ -7,7 +7,7 @@ export type SitemapProject = {
 }
 
 export function buildSitemapEntries(projects: SitemapProject[] = []): MetadataRoute.Sitemap {
-  const staticRoutes = ['', '/trang-chu', '/du-an', '/dich-vu', '/thiet-ke-website', '/gioi-thieu', '/lien-he'].map(
+  const staticRoutes = ['', '/trang-chu', '/du-an', '/dich-vu', '/thiet-ke-website', '/lien-he'].map(
     (path) => ({
       url: absoluteUrl(path || '/'),
       lastModified: new Date(),

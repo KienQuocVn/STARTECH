@@ -106,16 +106,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
               <div className="mb-2 flex items-center gap-2 font-medium text-slate-900">
                 <LockKeyhole className="h-4 w-4" />
-                Tai khoan seed mac dinh
+                Tài khoản seed mặc định
               </div>
               <p>
-                Email: <span className="font-mono text-slate-900">admin@startech.local</span>
+                Email: <span className="font-mono text-slate-900">kieukienquocbussiness@gmail.com</span>
               </p>
               <p>
                 Mat khau: <span className="font-mono text-slate-900">Startech@2026</span>
               </p>
               <p className="mt-2 text-xs text-slate-500">
-                Phien dang nhap admin hien duoc luu bang cookie an toan hon thay vi `localStorage`.
+                Phiên đăng nhập admin hiện được lưu bằng cookie an toàn hơn thay vì `localStorage`.
               </p>
             </div>
           </form>
@@ -131,13 +131,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 <div>
                   <p className="text-sm font-medium uppercase tracking-[0.28em] text-slate-500">STARTECH CMS</p>
                   <h2 className="mt-3 text-2xl font-semibold leading-tight text-slate-950">
-                    Chuyen tu website gioi thieu sang mot he thong van hanh noi dung gon, de mo rong.
+                    Chuyển từ website giới thiệu sang một hệ thống vận hành nội dung gọn, dễ mở rộng.
                   </h2>
                 </div>
               </div>
 
               <div className="space-y-3 rounded-3xl bg-slate-950 p-6 text-slate-100 shadow-xl">
-                <p className="text-sm text-slate-300">Huong di sau buoc dang nhap nay:</p>
+                <p className="text-sm text-slate-300">Hướng dẫn sau bước đăng nhập này:</p>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-3">
                     <ArrowRight className="mt-0.5 h-4 w-4 text-amber-300" />

@@ -63,6 +63,30 @@ export class SiteSettingsService {
     };
   }
 
+  async findPublic() {
+    const items = await this.prisma.siteSetting.findMany({
+      where: {
+        deletedAt: null,
+        settingKey: {
+          startsWith: 'public_',
+        },
+      },
+      orderBy: { settingKey: 'asc' },
+    });
+
+    const settings = items.reduce<Record<string, SiteSettingsValue>>((acc, item) => {
+      acc[item.settingKey] = parseValue(item.settingVal, item.type);
+      return acc;
+    }, {});
+
+    return {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Lay public site settings thanh cong.',
+      data: settings,
+    };
+  }
+
   async update(dto: UpdateSiteSettingsDto) {
     const entries = Object.entries(dto.settings ?? {});
 

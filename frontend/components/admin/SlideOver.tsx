@@ -13,9 +13,9 @@ interface SlideOverProps {
 }
 
 const sizeClasses = {
-  sm: 'w-96',
-  md: 'w-screen sm:w-96 md:w-[560px]',
-  lg: 'w-screen sm:w-96 md:w-[640px]',
+  sm: 'max-w-xl',
+  md: 'max-w-2xl',
+  lg: 'max-w-4xl',
 }
 
 export function SlideOver({
@@ -44,34 +44,22 @@ export function SlideOver({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <div className="absolute inset-y-0 right-0 flex max-w-full">
-        <div className={cn('w-full transition-transform duration-300 slide-in', sizeClasses[size])}>
-          <div className="h-full bg-white flex flex-col shadow-xl">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-              <button
-                onClick={onClose}
-                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              {children}
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className={cn('relative z-10 w-full rounded-[28px] border border-slate-200 bg-white shadow-2xl', sizeClasses[size])}>
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Admin modal</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-950">{title}</h2>
           </div>
+          <button
+            onClick={onClose}
+            className="rounded-full border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          >
+            <X size={18} />
+          </button>
         </div>
+        <div className="max-h-[calc(100vh-10rem)] overflow-y-auto px-6 py-5">{children}</div>
       </div>
     </div>
   )

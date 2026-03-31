@@ -43,6 +43,7 @@ type SectionFormState = {
   primaryButtonHref: string
   secondaryButtonLabel: string
   secondaryButtonHref: string
+  contentJson: string
   displayOrder: string
 }
 
@@ -77,6 +78,7 @@ function buildSectionForm(section?: SitePageSection | null): SectionFormState {
     primaryButtonHref: section?.primaryButtonHref ?? '',
     secondaryButtonLabel: section?.secondaryButtonLabel ?? '',
     secondaryButtonHref: section?.secondaryButtonHref ?? '',
+    contentJson: section?.contentJson ? JSON.stringify(section.contentJson, null, 2) : '',
     displayOrder: String(section?.displayOrder ?? 0),
   }
 }
@@ -119,7 +121,7 @@ export default function ContentPage() {
     loadPages()
       .catch((err) => {
         if (!active) return
-        setError(err instanceof Error ? err.message : 'Khong the tai noi dung site')
+        setError(err instanceof Error ? err.message : 'Không thể tải nội dung site')
       })
       .finally(() => {
         if (active) setIsLoading(false)
@@ -148,10 +150,10 @@ export default function ContentPage() {
     try {
       if (editingPage) {
         await updateAdminSitePage(editingPage.id, payload)
-        toast.success('Da cap nhat page content')
+        toast.success('Đã cập nhật page content')
       } else {
         await createAdminSitePage(payload)
-        toast.success('Da tao page content')
+        toast.success('Đã tạo page content')
       }
 
       await loadPages()
@@ -159,7 +161,7 @@ export default function ContentPage() {
       setEditingPage(null)
       setPageForm(buildPageForm())
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Khong the luu page')
+      toast.error(err instanceof Error ? err.message : 'Không thể lưu page')
     }
   }
 
@@ -167,6 +169,8 @@ export default function ContentPage() {
     if (!selectedPage) return
 
     try {
+      const parsedContentJson = sectionForm.contentJson.trim() ? JSON.parse(sectionForm.contentJson) : null
+
       await upsertAdminPageSection(selectedPage.id, {
         ...sectionForm,
         title: sectionForm.title || null,
@@ -177,14 +181,15 @@ export default function ContentPage() {
         primaryButtonHref: sectionForm.primaryButtonHref || null,
         secondaryButtonLabel: sectionForm.secondaryButtonLabel || null,
         secondaryButtonHref: sectionForm.secondaryButtonHref || null,
+        contentJson: parsedContentJson,
         displayOrder: Number(sectionForm.displayOrder || 0),
       })
       await loadPages()
       setIsSectionOpen(false)
       setSectionForm(buildSectionForm())
-      toast.success('Da luu section')
+      toast.success('Đã lưu section')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Khong the luu section')
+      toast.error(err instanceof Error ? err.message : 'Không thể lưu section')
     }
   }
 
@@ -199,29 +204,25 @@ export default function ContentPage() {
       await loadPages()
       setIsFaqOpen(false)
       setFaqForm(buildFaqForm())
-      toast.success('Da luu FAQ')
+      toast.success('Đã lưu FAQ')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Khong the luu FAQ')
+      toast.error(err instanceof Error ? err.message : 'Không thể lưu FAQ')
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Content</h1>
-          <p className="mt-1 text-gray-600">Quan ly page, section va FAQ tu live API</p>
-        </div>
         <Button
           onClick={() => {
             setEditingPage(null)
             setPageForm(buildPageForm())
             setIsPageOpen(true)
           }}
-          className="bg-brand-primary hover:bg-brand-secondary"
+          className=""
         >
           <Plus size={18} className="mr-2" />
-          Them page
+          Thêm page
         </Button>
       </div>
 
@@ -234,11 +235,11 @@ export default function ContentPage() {
               key={page.id}
               onClick={() => setSelectedPageId(page.id)}
               className={`w-full rounded-lg p-4 text-left transition-all ${
-                page.id === selectedPageId ? 'bg-brand-primary text-white' : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
+                page.id === selectedPageId ? ' bg-blue-100 text-black' : 'text-gray-900 '
               }`}
             >
               <p className="font-semibold">{page.title}</p>
-              <p className={`text-xs ${page.id === selectedPageId ? 'text-blue-100' : 'text-gray-500'}`}>/{page.slug}</p>
+              <p className={`text-xs ${page.id === selectedPageId ? 'text-black' : 'text-black'}`}>/{page.slug}</p>
             </button>
           ))}
         </div>
@@ -260,7 +261,7 @@ export default function ContentPage() {
                         setPageForm(buildPageForm(selectedPage))
                         setIsPageOpen(true)
                       }}
-                      className="rounded p-1 text-brand-primary transition-colors hover:bg-blue-50"
+                      className="rounded p-1 text-brand-primary transition-colors"
                     >
                       <Edit2 size={16} />
                     </button>
@@ -268,7 +269,7 @@ export default function ContentPage() {
                       onDelete={async () => {
                         await deleteAdminSitePage(selectedPage.id)
                         await loadPages()
-                        toast.success('Da xoa page')
+                        toast.success('Đã xóa page')
                       }}
                       itemName={selectedPage.title}
                     />
@@ -284,10 +285,10 @@ export default function ContentPage() {
                       setSectionForm(buildSectionForm())
                       setIsSectionOpen(true)
                     }}
-                    className="bg-brand-primary hover:bg-brand-secondary"
+                    className=""
                   >
                     <Plus size={16} className="mr-2" />
-                    Them section
+                    Thêm section
                   </Button>
                 </div>
                 <div className="space-y-3">
@@ -296,7 +297,8 @@ export default function ContentPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="font-semibold text-gray-900">{section.sectionKey}</p>
-                          <p className="text-sm text-gray-600">{section.title || section.description || 'Section khong co noi dung mo ta.'}</p>
+                          <p className="text-sm text-gray-600">{section.title || section.description || 'Section không có nội dung mô tả.'}</p>
+                          {section.contentJson ? <p className="mt-2 text-xs text-gray-400">Có dữ liệu JSON cấu trúc</p> : null}
                         </div>
                         <div className="flex items-center gap-2">
                           <button
@@ -304,7 +306,7 @@ export default function ContentPage() {
                               setSectionForm(buildSectionForm(section))
                               setIsSectionOpen(true)
                             }}
-                            className="rounded p-1 text-brand-primary transition-colors hover:bg-blue-50"
+                            className="rounded p-1 text-brand-primary transition-colors"
                           >
                             <Edit2 size={16} />
                           </button>
@@ -312,7 +314,7 @@ export default function ContentPage() {
                             onDelete={async () => {
                               await deleteAdminPageSection(section.id)
                               await loadPages()
-                              toast.success('Da xoa section')
+                              toast.success('Đã xóa section')
                             }}
                             itemName={section.sectionKey}
                           />
@@ -321,7 +323,7 @@ export default function ContentPage() {
                     </Card>
                   ))}
                   {selectedPage.sections.length === 0 ? (
-                    <EmptyState icon={<FileText size={40} />} title="Chua co section" description="Them section dau tien cho page nay." />
+                    <EmptyState icon={<FileText size={40} />} title="Chưa có section" description="Thêm section đầu tiên cho page này." />
                   ) : null}
                 </div>
               </Card>
@@ -334,10 +336,10 @@ export default function ContentPage() {
                       setFaqForm(buildFaqForm())
                       setIsFaqOpen(true)
                     }}
-                    className="bg-brand-primary hover:bg-brand-secondary"
+                    className=""
                   >
                     <Plus size={16} className="mr-2" />
-                    Them FAQ
+                    Thêm FAQ
                   </Button>
                 </div>
                 <div className="space-y-3">
@@ -354,7 +356,7 @@ export default function ContentPage() {
                               setFaqForm(buildFaqForm(faq))
                               setIsFaqOpen(true)
                             }}
-                            className="rounded p-1 text-brand-primary transition-colors hover:bg-blue-50"
+                            className="rounded p-1 text-brand-primary transition-colors "
                           >
                             <Edit2 size={16} />
                           </button>
@@ -362,7 +364,7 @@ export default function ContentPage() {
                             onDelete={async () => {
                               await deleteAdminFaq(faq.id)
                               await loadPages()
-                              toast.success('Da xoa FAQ')
+                              toast.success('Đã xóa FAQ')
                             }}
                             itemName={faq.question}
                           />
@@ -371,7 +373,7 @@ export default function ContentPage() {
                     </Card>
                   ))}
                   {selectedPage.faqs.length === 0 ? (
-                    <EmptyState icon={<HelpCircle size={40} />} title="Chua co FAQ" description="Them FAQ de bo sung schema va noi dung SEO." />
+                    <EmptyState icon={<HelpCircle size={40} />} title="Chưa có FAQ" description="Thêm FAQ để bổ sung schema và nội dung SEO." />
                   ) : null}
                 </div>
               </Card>
@@ -379,16 +381,16 @@ export default function ContentPage() {
           ) : (
             <EmptyState
               icon={<FileText size={48} />}
-              title={isLoading ? 'Dang tai page content' : 'Chua co page nao'}
-              description={isLoading ? 'He thong dang lay du lieu tu backend.' : 'Hay tao page content dau tien.'}
+              title={isLoading ? 'Đang tải page content' : 'Chưa có page nào'}
+              description={isLoading ? 'Hệ thống đang tải dữ liệu từ backend.' : 'Hãy tạo page content đầu tiên.'}
             />
           )}
         </div>
       </div>
 
-      <SlideOver isOpen={isPageOpen} onClose={() => setIsPageOpen(false)} title={editingPage ? 'Cap nhat page' : 'Them page'} size="md">
+      <SlideOver isOpen={isPageOpen} onClose={() => setIsPageOpen(false)} title={editingPage ? 'Cập nhật page' : 'Thêm page'} size="md">
         <div className="space-y-4">
-          {(['slug', 'title', 'seoTitle', 'heroBadge', 'heroTitle'] as Array<keyof PageFormState>).map((field) => (
+          {(['slug', 'Tiêu đề', 'Tiêu đề SEO', 'heroBadge', 'heroTitle'] as Array<keyof PageFormState>).map((field) => (
             <div key={field}>
               <label className="text-sm font-semibold capitalize text-gray-900">{field}</label>
               <input
@@ -399,7 +401,7 @@ export default function ContentPage() {
             </div>
           ))}
           <div>
-            <label className="text-sm font-semibold text-gray-900">seoDescription</label>
+            <label className="text-sm font-semibold text-gray-900">Mô tả SEO</label>
             <textarea
               value={pageForm.seoDescription}
               onChange={(event) => setPageForm((prev) => ({ ...prev, seoDescription: event.target.value }))}
@@ -407,22 +409,22 @@ export default function ContentPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-gray-900">heroDescription</label>
+            <label className="text-sm font-semibold text-gray-900">Mô tả hero</label>
             <textarea
               value={pageForm.heroDescription}
               onChange={(event) => setPageForm((prev) => ({ ...prev, heroDescription: event.target.value }))}
               className="mt-2 min-h-24 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
-          <Button onClick={savePage} className="w-full bg-brand-primary hover:bg-brand-secondary">
-            Luu page
+          <Button onClick={savePage} className="w-full ">
+            Lưu page
           </Button>
         </div>
       </SlideOver>
 
-      <SlideOver isOpen={isSectionOpen} onClose={() => setIsSectionOpen(false)} title={sectionForm.id ? 'Cap nhat section' : 'Them section'} size="md">
+      <SlideOver isOpen={isSectionOpen} onClose={() => setIsSectionOpen(false)} title={sectionForm.id ? 'Cập nhật section' : 'Thêm section'} size="md">
         <div className="space-y-4">
-          {(['sectionKey', 'title', 'subtitle', 'imageUrl', 'primaryButtonLabel', 'primaryButtonHref', 'secondaryButtonLabel', 'secondaryButtonHref', 'displayOrder'] as Array<keyof SectionFormState>).map((field) => (
+          {(['sectionKey', 'Tiêu đề', 'Phụ đề', 'URL hình ảnh', 'primaryButtonLabel', 'primaryButtonHref', 'secondaryButtonLabel', 'secondaryButtonHref', 'displayOrder'] as Array<keyof SectionFormState>).map((field) => (
             <div key={field}>
               <label className="text-sm font-semibold capitalize text-gray-900">{field}</label>
               <input
@@ -433,23 +435,32 @@ export default function ContentPage() {
             </div>
           ))}
           <div>
-            <label className="text-sm font-semibold text-gray-900">description</label>
+            <label className="text-sm font-semibold text-gray-900">Mô tả</label>
             <textarea
               value={sectionForm.description}
               onChange={(event) => setSectionForm((prev) => ({ ...prev, description: event.target.value }))}
               className="mt-2 min-h-24 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
-          <Button onClick={saveSection} className="w-full bg-brand-primary hover:bg-brand-secondary">
-            Luu section
+          <div>
+            <label className="text-sm font-semibold text-gray-900">contentJson</label>
+            <textarea
+              value={sectionForm.contentJson}
+              onChange={(event) => setSectionForm((prev) => ({ ...prev, contentJson: event.target.value }))}
+              className="mt-2 min-h-40 w-full rounded-lg border border-gray-300 px-3 py-2 font-mono text-xs"
+              placeholder='{"items":[]}'
+            />
+          </div>
+          <Button onClick={saveSection} className="w-full ">
+            Lưu section
           </Button>
         </div>
       </SlideOver>
 
-      <SlideOver isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} title={faqForm.id ? 'Cap nhat FAQ' : 'Them FAQ'} size="md">
+      <SlideOver isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} title={faqForm.id ? 'ập nhật FAQ' : 'Thêm FAQ'} size="md">
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-semibold text-gray-900">Question</label>
+            <label className="text-sm font-semibold text-gray-900">Câu hỏi</label>
             <input
               value={faqForm.question}
               onChange={(event) => setFaqForm((prev) => ({ ...prev, question: event.target.value }))}
@@ -457,7 +468,7 @@ export default function ContentPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-gray-900">Answer</label>
+            <label className="text-sm font-semibold text-gray-900">Câu trả lời</label>
             <textarea
               value={faqForm.answer}
               onChange={(event) => setFaqForm((prev) => ({ ...prev, answer: event.target.value }))}
@@ -465,15 +476,15 @@ export default function ContentPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-gray-900">Display order</label>
+            <label className="text-sm font-semibold text-gray-900">Thứ tự hiển thị</label>
             <input
               value={faqForm.displayOrder}
               onChange={(event) => setFaqForm((prev) => ({ ...prev, displayOrder: event.target.value }))}
               className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
-          <Button onClick={saveFaq} className="w-full bg-brand-primary hover:bg-brand-secondary">
-            Luu FAQ
+          <Button onClick={saveFaq} className="w-full ">
+            Lưu FAQ
           </Button>
         </div>
       </SlideOver>

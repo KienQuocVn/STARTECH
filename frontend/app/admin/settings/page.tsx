@@ -1,144 +1,102 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { Save } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { getSiteSettings, updateSiteSettings, type SiteSettingsMap } from '@/lib/services/site-settings'
-import { toast } from 'sonner'
+import { getAdminSiteSettings, updateAdminSiteSettings, type SiteSettingsMap } from '@/lib/services/site-settings'
 
-type SettingsForm = {
-  logo: string
-  siteName: string
-  description: string
-  email: string
-  phone: string
-  address: string
-  facebook: string
-  instagram: string
-  linkedin: string
-  zalo: string
+type SettingsFormState = {
+  public_navigation: string
+  public_footer: string
+  public_contact_form: string
 }
 
-function buildForm(settings: SiteSettingsMap): SettingsForm {
-  const socialLinks = (settings.socialLinks as Record<string, string> | undefined) ?? {}
+function stringifySetting(value: unknown) {
+  return value ? JSON.stringify(value, null, 2) : ''
+}
 
+function buildForm(settings?: SiteSettingsMap): SettingsFormState {
   return {
-    logo: String(settings.logo ?? ''),
-    siteName: String(settings.siteName ?? ''),
-    description: String(settings.description ?? ''),
-    email: String(settings.email ?? ''),
-    phone: String(settings.phone ?? ''),
-    address: String(settings.address ?? ''),
-    facebook: socialLinks.facebook ?? '',
-    instagram: socialLinks.instagram ?? '',
-    linkedin: socialLinks.linkedin ?? '',
-    zalo: socialLinks.zalo ?? '',
+    public_navigation: stringifySetting(settings?.public_navigation),
+    public_footer: stringifySetting(settings?.public_footer),
+    public_contact_form: stringifySetting(settings?.public_contact_form),
   }
 }
 
 export default function SettingsPage() {
-  const [form, setForm] = useState<SettingsForm>(buildForm({}))
-  const [error, setError] = useState<string | null>(null)
+  const [form, setForm] = useState<SettingsFormState>(buildForm())
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    getSiteSettings()
-      .then((response) => setForm(buildForm(response.data ?? {})))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Khong the tai site settings'))
-      .finally(() => setIsLoading(false))
+    let active = true
+
+    getAdminSiteSettings()
+      .then((response) => {
+        if (!active) return
+        setForm(buildForm(response.data))
+      })
+      .catch((error) => {
+        if (!active) return
+        toast.error(error instanceof Error ? error.message : 'Không thể tải cài đặt trang web')
+      })
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   const saveSettings = async () => {
     try {
-      await updateSiteSettings({
-        logo: form.logo,
-        siteName: form.siteName,
-        description: form.description,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        socialLinks: {
-          facebook: form.facebook,
-          instagram: form.instagram,
-          linkedin: form.linkedin,
-          zalo: form.zalo,
-        },
+      await updateAdminSiteSettings({
+        public_navigation: form.public_navigation.trim() ? JSON.parse(form.public_navigation) : null,
+        public_footer: form.public_footer.trim() ? JSON.parse(form.public_footer) : null,
+        public_contact_form: form.public_contact_form.trim() ? JSON.parse(form.public_contact_form) : null,
       })
-      toast.success('Da luu site settings')
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Khong the luu settings')
+      toast.success('Đã cập nhật cài đặt trang web')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Không thể cập nhật cài đặt trang web')
     }
   }
 
-  const updateField = (key: keyof SettingsForm, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }))
-  }
-
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-gray-600">Thong tin website dang duoc doc va ghi tu bang site_setting</p>
-      </div>
-
-      {error ? <Card className="p-4 text-sm text-red-600">{error}</Card> : null}
-
-      <Card className="p-6">
-        <h2 className="mb-6 text-lg font-bold text-gray-900">Thong tin website</h2>
-        <div className="space-y-5">
+    <div className="space-y-6">
+      <Card className="rounded-[28px] border-slate-200 p-6 shadow-lg shadow-slate-200/60">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <Label htmlFor="logo">Logo</Label>
-            <div className="mt-2 flex items-center gap-4">
-              <div className="relative h-20 w-20 overflow-hidden rounded-lg border bg-gray-50">
-                {form.logo ? <Image src={form.logo} alt="Logo" fill className="object-contain" /> : null}
-              </div>
-              <Input id="logo" value={form.logo} onChange={(event) => updateField('logo', event.target.value)} />
-            </div>
+            <h1 className="text-2xl font-semibold text-slate-950">Cài đặt trang web</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Quản lý dữ liệu global cho menu, footer và form liên hệ. Frontend public sẽ tải trực tiếp từ backend.
+            </p>
           </div>
-          {(['siteName', 'email', 'phone', 'address'] as Array<keyof SettingsForm>).map((field) => (
-            <div key={field}>
-              <Label htmlFor={field}>{field}</Label>
-              <Input id={field} value={form[field]} onChange={(event) => updateField(field, event.target.value)} className="mt-2" />
-            </div>
-          ))}
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <textarea
-              id="description"
-              value={form.description}
-              onChange={(event) => updateField('description', event.target.value)}
-              className="mt-2 min-h-24 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            />
-          </div>
+          <Button onClick={saveSettings} disabled={isLoading} className="gap-2">
+            <Save size={16} />
+            Lưu cài đặt
+          </Button>
         </div>
       </Card>
 
-      <Card className="p-6">
-        <h2 className="mb-6 text-lg font-bold text-gray-900">Social links</h2>
-        <div className="space-y-4">
-          {(['facebook', 'instagram', 'linkedin', 'zalo'] as Array<keyof SettingsForm>).map((field) => (
-            <div key={field}>
-              <Label htmlFor={field}>{field}</Label>
-              <Input id={field} value={form[field]} onChange={(event) => updateField(field, event.target.value)} className="mt-2" />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card className="p-6 text-sm text-gray-600">
-        {isLoading
-          ? 'Dang tai site settings tu backend.'
-          : 'Workflow doi mat khau va permission granularity sau role enum chua co API rieng, nen duoc giu trong backlog backend.'}
-      </Card>
-
-      <Button onClick={saveSettings} className="bg-brand-primary hover:bg-brand-secondary">
-        <Save size={18} className="mr-2" />
-        Luu settings
-      </Button>
+      {(
+        [
+          ['public_navigation', 'Menu điều hướng'],
+          ['public_footer', 'Footer'],
+          ['public_contact_form', 'Form liên hệ'],
+        ] as const
+      ).map(([key, label]) => (
+        <Card key={key} className="rounded-[28px] border-slate-200 p-6 shadow-lg shadow-slate-200/60">
+          <label className="text-sm font-semibold text-slate-900">{label}</label>
+          <textarea
+            value={form[key]}
+            onChange={(event) => setForm((prev) => ({ ...prev, [key]: event.target.value }))}
+            className="mt-3 min-h-[280px] w-full rounded-2xl border border-slate-200 px-4 py-3 font-mono text-xs text-slate-700"
+            placeholder="{}"
+          />
+        </Card>
+      ))}
     </div>
   )
 }

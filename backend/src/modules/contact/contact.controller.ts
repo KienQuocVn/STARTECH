@@ -29,7 +29,7 @@ export class ContactController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
   @Permissions('lead.read')
-  @ApiOperation({ summary: 'Lay danh sach lead lien he cho admin' })
+  @ApiOperation({ summary: 'Lấy danh sách lead liên hệ cho admin' })
   findAll() {
     return this.contactService.findAll();
   }
@@ -47,7 +47,7 @@ export class ContactController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Permissions('lead.delete')
-  @ApiOperation({ summary: 'Xoa lead lien he' })
+  @ApiOperation({ summary: 'Xóa lead liên hệ' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.contactService.remove(id);
   }

@@ -1545,8 +1545,119 @@ async function main() {
     },
   });
 
+  const servicesPage = await prisma.sitePage.create({
+    data: {
+      slug: 'dich-vu',
+      title: 'Dịch vụ',
+      seoTitle: 'Dịch vụ thiết kế website, SEO và triển khai digital tại STARTECH',
+      seoDescription:
+        'Khám phá các nhóm dịch vụ STARTECH đang cung cấp: thiết kế website, website bán hàng, SEO, quản trị và vận hành online cho doanh nghiệp.',
+      heroBadge: 'Hệ sinh thái dịch vụ',
+      heroTitle: 'Giải pháp triển khai linh hoạt cho doanh nghiệp',
+      heroDescription:
+        'Trang dịch vụ tập trung trình bày các hướng triển khai website, SEO và vận hành giúp doanh nghiệp xây dựng hiện diện số bền vững.',
+    },
+  });
+
+  const projectsPage = await prisma.sitePage.create({
+    data: {
+      slug: 'du-an',
+      title: 'Dự án',
+      seoTitle: 'Portfolio dự án website STARTECH đã triển khai',
+      seoDescription: 'Tổng hợp các mẫu website doanh nghiệp, bán hàng, portfolio và landing page STARTECH đã thiết kế cho khách hàng.',
+      heroBadge: 'Portfolio triển khai',
+      heroTitle: 'Dự án thực tế trên nhiều lĩnh vực',
+      heroDescription: 'Trang dự án được dùng để trưng bày năng lực thiết kế, công nghệ triển khai và các dự án tiêu biểu đã đi vào vận hành.',
+    },
+  });
+
+  const aboutPage = await prisma.sitePage.create({
+    data: {
+      slug: 'gioi-thieu',
+      title: 'Giới thiệu',
+      seoTitle: 'Giới thiệu STARTECH và đội ngũ triển khai website',
+      seoDescription: 'Tìm hiểu về đội ngũ, giá trị khác biệt, những nhóm dịch vụ và năng lực triển khai của STARTECH.',
+      heroBadge: 'Điểm đa dạng của STARTECH',
+      heroTitle: 'Chúng tôi',
+      heroDescription: 'Sở hữu những chiến binh giàu kinh nghiệm thực chiến',
+    },
+  });
+
   await prisma.pageSection.createMany({
     data: [
+      {
+        pageId: homePage.id,
+        sectionKey: 'home-hero',
+        title: 'Thiết kế mang lại cảm xúc.',
+        subtitle: 'Những trải nghiệm để lại ấn tượng sâu sắc.',
+        description: 'Chúng tôi kết hợp sự sáng tạo, cảm xúc và đổi mới để tạo ra thế giới kỹ thuật số mà khán giả của bạn có thể kết nối.',
+        primaryButtonLabel: 'Liên hệ ngay',
+        primaryButtonHref: '/lien-he',
+        contentJson: {
+          sideDescription:
+            'Dù thông qua giao diện trực quan, hiệu ứng 3D sống động hay cách kể chuyện bằng hình ảnh táo bạo, chúng tôi thiết kế những khoảnh khắc mà mọi người không chỉ nhìn thấy mà còn cảm nhận được.',
+          pills: ['UI/UX', '3D VISUALIZATION', 'DEVELOPMENT', '+'],
+          scrollLabel: 'Cuộn để khám phá',
+        },
+        displayOrder: 0,
+      },
+      {
+        pageId: homePage.id,
+        sectionKey: 'home-stats',
+        title: 'Thống kê nổi bật',
+        contentJson: {
+          items: [
+            {
+              icon: '/icon/icon-khach-hang-tin-dung.png',
+              label: 'Được tin tưởng bởi',
+              value: '100+ khách hàng, doanh nghiệp',
+            },
+            {
+              icon: '/icon/icon-giao-dien.png',
+              label: 'Có sẵn',
+              value: '400+ giao diện đẹp, chuẩn SEO',
+            },
+            {
+              icon: '/icon/icon-linh-vuc.png',
+              label: 'Đáp ứng',
+              value: '50+ lĩnh vực, ngành nghề',
+            },
+          ],
+        },
+        displayOrder: 1,
+      },
+      {
+        pageId: homePage.id,
+        sectionKey: 'home-services',
+        title: 'STARTECH giúp gia tăng doanh số với SEO và Marketing',
+        subtitle: 'Làm sao để có hàng trăm đơn hàng mới mỗi ngày từ website?',
+        description: '/img/tang-doanh-so-ban-hang-voi-seo-marketing.png',
+        contentJson: {
+          items: [
+            {
+              icon: '/icon/icon-khach-hang-tin-dung.png',
+              title: 'Hỗ trợ SEO mạnh mẽ',
+              description: 'Tối ưu cấu trúc, Core Web Vitals, dễ dàng tùy chỉnh SEO onpage để đạt thứ hạng cao.',
+            },
+            {
+              icon: '/icon/icon-khach-hang-tin-dung.png',
+              title: 'Tăng hiệu quả quảng cáo',
+              description: 'Trang đích tối ưu, tích hợp Google Ads và Facebook Ads giúp tiếp cận khách hàng hiệu quả.',
+            },
+            {
+              icon: '/icon/icon-khach-hang-tin-dung.png',
+              title: 'Tăng 30% tỷ lệ hoàn tất đơn',
+              description: 'Abandoned checkout nhắc lại giỏ hàng, email marketing và coupon thúc đẩy chuyển đổi.',
+            },
+            {
+              icon: '/icon/icon-khach-hang-tin-dung.png',
+              title: 'Đo lường và phân tích',
+              description: 'Báo cáo dữ liệu khách hàng và hành vi mua sắm giúp tối ưu chiến lược kịp thời.',
+            },
+          ],
+        },
+        displayOrder: 2,
+      },
       {
         pageId: homePage.id,
         sectionKey: 'faq',
@@ -1561,6 +1672,133 @@ async function main() {
         title: 'Bạn hỏi - StarTech trả lời',
         subtitle: 'Những câu hỏi phổ biến về dịch vụ thiết kế website',
         description: 'Khối FAQ này là bước đầu tiên trong lộ trình chuyển hardcode content sang database.',
+        displayOrder: 1,
+      },
+    ],
+  });
+
+  await prisma.pageSection.createMany({
+    data: [
+      {
+        pageId: aboutPage.id,
+        sectionKey: 'about-hero',
+        title: 'Chúng tôi',
+        description: 'Sở hữu những chiến binh giàu kinh nghiệm thực chiến',
+        imageUrl: '/img/thiet-ke-web-site-tai-vinh-phuc-2.png',
+        displayOrder: 0,
+      },
+      {
+        pageId: aboutPage.id,
+        sectionKey: 'about-intro',
+        title: 'Chúng tôi là',
+        description:
+          'Đội ngũ StarTech với kinh nghiệm tham gia nhiều cuộc chiến trong nhiều năm liền ở thị trường Marketing, giờ đây chúng tôi chính thức là một đội quân hùng mạnh với mong muốn đồng hành và phát triển cùng bạn.',
+        imageUrl: '/img/dich-vu-thiet-ke-website-xay-dung.png',
+        displayOrder: 1,
+      },
+      {
+        pageId: aboutPage.id,
+        sectionKey: 'about-services',
+        title: 'Làm việc tận tâm đã tạo nên uy tín cho STARTECH',
+        subtitle: 'Những dịch vụ nổi bật',
+        imageUrl: '/img/dich-vu-thiet-ke-website-xay-dung.png',
+        primaryButtonLabel: 'Xem tất cả dịch vụ',
+        primaryButtonHref: '/dich-vu',
+        contentJson: {
+          items: [
+            'Thiết kế website',
+            'Thiết kế sàn thương mại điện tử',
+            'Thiết kế Mobile App',
+            'Thiết kế Web App',
+            'Dịch vụ SEO',
+            'Quản trị website',
+            'Hosting - Domain',
+            'Dịch vụ quảng cáo đa kênh',
+            'Thiết kế Branding - Thương hiệu',
+            'Chụp hình thương hiệu',
+            'Đăng ký website với Bộ Công Thương',
+          ],
+        },
+        displayOrder: 2,
+      },
+      {
+        pageId: aboutPage.id,
+        sectionKey: 'about-highlights',
+        title: 'VÌ SAO NÊN CHỌN LÀM VIỆC - SÁNG TẠO VỚI STARTECH?',
+        imageUrl: '/img/professional-web-design-team.jpg',
+        primaryButtonLabel: 'Tìm hiểu thêm',
+        contentJson: {
+          items: [
+            'Đội ngũ chuyên gia giàu kinh nghiệm',
+            'Công nghệ hiện đại, tiên tiến',
+            'Giải pháp tùy chỉnh theo nhu cầu',
+            'Hỗ trợ 24/7',
+            'Bảo mật thông tin tuyệt đối',
+            'Chi phí hợp lý, hiệu quả cao',
+          ],
+        },
+        displayOrder: 3,
+      },
+      {
+        pageId: aboutPage.id,
+        sectionKey: 'about-values',
+        title: 'Giá trị khác biệt tại STARTECH',
+        subtitle: 'Không ngừng nỗ lực nâng cao chất lượng dịch vụ',
+        description:
+          'STARTECH sở hữu đội ngũ chiến binh dày dạn kinh nghiệm thực chiến trên thị trường Marketing. Chúng tôi luôn trong tâm thế sẵn sàng tham gia bất kỳ cuộc chiến nào cùng với doanh nghiệp bạn.',
+        imageUrl: '/img/dich-vu-thiet-ke-website-xay-dung.png',
+        primaryButtonLabel: 'Chiến lợi phẩm sau bao ngày ra trận của STARTECH',
+        primaryButtonHref: '/du-an',
+        secondaryButtonLabel: 'Liên hệ ngay',
+        secondaryButtonHref: '/img/dich-vu-thiet-ke-website-xay-dung.png',
+        contentJson: {
+          videoDescription:
+            'Chiến binh của chúng tôi không ngừng nỗ lực mang đến cho bạn những trải nghiệm dịch vụ tốt nhất, sẵn sàng hỗ trợ 24/7 để giải đáp mọi khó khăn trong quá trình sử dụng.',
+          trophyDescription:
+            'Đội ngũ STARTECH luôn tận tâm và nhiệt huyết nhằm đem đến những sản phẩm giá trị cho khách hàng. Nhờ vậy mà những dự án thiết kế website ra đời luôn vận hành thành công và hiệu quả.',
+          values: [
+            {
+              number: '01',
+              title: 'Sáng tạo',
+              description: 'Sáng tạo trong phong cách thiết kế và luôn cập nhật xu hướng mới thường xuyên.',
+            },
+            {
+              number: '02',
+              title: 'Kinh nghiệm',
+              description: 'Kinh nghiệm chiến đấu nhiều năm trên chiến trường Marketing giúp STARTECH hiểu rất rõ nhu cầu doanh nghiệp.',
+            },
+            {
+              number: '03',
+              title: 'Thấu hiểu',
+              description: 'STARTECH dễ dàng nhìn nhận và thấu hiểu vấn đề một cách nhanh chóng để đưa ra hướng xử lý phù hợp.',
+            },
+            {
+              number: '04',
+              title: 'Đa dạng',
+              description: 'Hệ sinh thái Marketing đa dịch vụ giúp STARTECH hỗ trợ doanh nghiệp toàn diện và bền vững.',
+            },
+          ],
+          diversityItems: ['Sử dụng nhiều ngôn ngữ lập trình', 'Nhiều đối tác liên kết', 'Hệ sinh thái Marketing', 'Sáng tạo trong thiết kế'],
+          ctaDescription: 'Ngay bây giờ chính là thời điểm sớm nhất để bắt đầu hành trình phát triển hiện diện số cùng STARTECH.',
+          ctaLabel: 'Liên hệ ngay',
+          ctaHref: '/lien-he',
+        },
+        displayOrder: 4,
+      },
+      {
+        pageId: servicesPage.id,
+        sectionKey: 'services-overview',
+        title: 'Tổng quan dịch vụ',
+        subtitle: 'Các nhóm dịch vụ doanh nghiệp có thể triển khai cùng STARTECH',
+        description: 'Trang dịch vụ sẽ được admin quản lý từ database thay vì nhúng text cố định trong frontend.',
+        displayOrder: 1,
+      },
+      {
+        pageId: projectsPage.id,
+        sectionKey: 'projects-overview',
+        title: 'Tổng quan portfolio',
+        subtitle: 'Những dự án tiêu biểu STARTECH đã triển khai',
+        description: 'Trang dự án dùng page content từ database cho SEO, hero và các khối mô tả chung.',
         displayOrder: 1,
       },
     ],
@@ -1641,11 +1879,168 @@ async function main() {
     ],
   });
 
+  await prisma.faqItem.createMany({
+    data: [
+      {
+        pageId: servicesPage.id,
+        question: 'STARTECH hiện có những dịch vụ nào?',
+        answer: 'STARTECH cung cấp thiết kế website, website bán hàng, web app, SEO, quản trị website và các dịch vụ hỗ trợ triển khai online.',
+        displayOrder: 1,
+      },
+      {
+        pageId: servicesPage.id,
+        question: 'Doanh nghiệp nên bắt đầu từ đâu?',
+        answer:
+          'Tùy mục tiêu kinh doanh, doanh nghiệp có thể bắt đầu từ website giới thiệu, landing page chuyển đổi hoặc website bán hàng để tạo kết quả nhanh nhất.',
+        displayOrder: 2,
+      },
+      {
+        pageId: projectsPage.id,
+        question: 'Portfolio trên STARTECH có phải dự án thực tế không?',
+        answer: 'Có. Đây là các dự án, mẫu triển khai và showcase STARTECH dùng để minh họa năng lực thiết kế, quản trị và triển khai website.',
+        displayOrder: 1,
+      },
+      {
+        pageId: projectsPage.id,
+        question: 'Có thể yêu cầu thiết kế tương tự portfolio không?',
+        answer: 'Có. Đội ngũ sẽ tư vấn dựa trên ngành hàng, mục tiêu kinh doanh và các dự án bạn tham khảo để đề xuất hướng giao diện phù hợp.',
+        displayOrder: 2,
+      },
+    ],
+  });
+
+  await prisma.contact_submission.createMany({
+    data: [
+      {
+        name: 'Nguyễn Minh Anh',
+        email: 'minhanh@example.com',
+        phone: '0912345678',
+        company: 'Công ty Nông sản Xanh',
+        service: 'THIẾT KẾ WEBSITE',
+        message: 'Tôi cần website giới thiệu doanh nghiệp và form nhận yêu cầu báo giá.',
+        status: 'WAITING',
+      },
+      {
+        name: 'Trần Hải Yến',
+        email: 'haiyen@example.com',
+        phone: '0987123456',
+        company: 'Moonlook Beauty',
+        service: 'THIẾT KẾ SÀN THƯƠNG MẠI ĐIỆN TỬ',
+        message: 'Muốn nâng cấp website bán hàng hiện tại và tối ưu chuyển đổi trên mobile.',
+        status: 'VIEWED',
+      },
+      {
+        name: 'Lê Quốc Bình',
+        email: 'quocbinh@example.com',
+        phone: '0903555777',
+        company: 'Bình Minh Education',
+        service: 'DỊCH VỤ SEO',
+        message: 'Cần SEO cho website khóa học online, đặc biệt là tối ưu landing page và blog.',
+        status: 'PROCESSED',
+      },
+      {
+        name: 'Phạm Thu Trang',
+        email: 'thutrang@example.com',
+        phone: '0938111222',
+        company: 'An Tâm Dental',
+        service: 'QUẢN TRỊ WEBSITE',
+        message: 'Cần đội ngũ hỗ trợ cập nhật nội dung và chỉnh sửa banner định kỳ hàng tháng.',
+        status: 'WAITING',
+      },
+      {
+        name: 'Hoàng Gia Huy',
+        email: 'giahuy@example.com',
+        phone: '0977000111',
+        company: 'Huy Phát Logistics',
+        service: 'THIẾT KẾ WEB APP',
+        message: 'Tôi muốn xây dựng hệ thống web app quản lý đơn hàng và điều phối nội bộ.',
+        status: 'VIEWED',
+      },
+      {
+        name: 'Đỗ Khánh Linh',
+        email: 'khanhlinh@example.com',
+        phone: '0944555666',
+        company: 'Linh Decor',
+        service: 'THIẾT KẾ WEBSITE',
+        message: 'Cần website showcase portfolio nội thất và tối ưu trải nghiệm hình ảnh.',
+        status: 'WAITING',
+      },
+    ],
+  });
+
   await prisma.siteSetting.createMany({
     data: [
       { settingKey: 'site_name', settingVal: 'STARTECH', type: 'string' },
       { settingKey: 'site_tagline', settingVal: 'Đổi mới công nghệ, tối đa hiệu quả', type: 'string' },
       { settingKey: 'primary_contact_email', settingVal: 'kieukienquocbusiness@gmail.com', type: 'string' },
+      {
+        settingKey: 'public_navigation',
+        settingVal: JSON.stringify({
+          items: [
+            { name: 'Trang chủ', href: '/' },
+            { name: 'Dịch vụ', href: '/dich-vu' },
+            { name: 'Dự án', href: '/du-an' },
+            { name: 'Thiết kế website', href: '/thiet-ke-website' },
+          ],
+          socialLinks: [
+            { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61581525345220' },
+            { name: 'TikTok', href: 'https://www.tiktok.com/@kienquocz?lang=vi-VN' },
+            { name: 'Instagram', href: 'https://www.instagram.com' },
+            { name: 'YouTube', href: 'https://www.youtube.com' },
+          ],
+          ctaLabel: 'Liên hệ',
+          ctaHref: '/lien-he',
+          promoLabel: 'Kết nối với chúng tôi',
+          promoTitle: 'STARTECH đồng hành cùng doanh nghiệp trên hành trình phát triển hiện diện số.',
+        }),
+        type: 'json',
+      },
+      {
+        settingKey: 'public_footer',
+        settingVal: JSON.stringify({
+          companyDescription: 'STARTECH ra đời với sứ mệnh đồng hành và nâng tầm thương hiệu của bạn trên thị trường Internet.',
+          officeInfo: [
+            'Địa chỉ: 347/15 Huỳnh Văn Bánh, Phường 11, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+            'Số điện thoại: 0919 925 302',
+            'Email: kieukienquocbusiness@gmail.com',
+            'Thời gian hoạt động: Thứ 2 - Thứ 6 từ 8h30 - 17h30',
+            'Thứ 7 từ 8h30 - 12h30',
+          ],
+          services: [
+            { name: 'Hosting', href: '/dich-vu' },
+            { name: 'Domain', href: '/dich-vu' },
+            { name: 'Dịch vụ SEO', href: '/dich-vu' },
+            { name: 'Thiết kế website', href: '/thiet-ke-website' },
+            { name: 'Thiết kế Web App', href: '/dich-vu' },
+            { name: 'Quản trị website', href: '/dich-vu' },
+          ],
+          socialLinks: [
+            { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61581525345220' },
+            { name: 'TikTok', href: 'https://www.tiktok.com/@kienquocz?lang=vi-VN' },
+            { name: 'Instagram', href: 'https://www.instagram.com' },
+            { name: 'YouTube', href: 'https://www.youtube.com' },
+          ],
+          copyright: '© 2026 STARTECH. Bản quyền thuộc về STARTECH.',
+        }),
+        type: 'json',
+      },
+      {
+        settingKey: 'public_contact_form',
+        settingVal: JSON.stringify({
+          introText: 'STARTECH luôn tư vấn miễn phí. Hãy để lại thông tin để đội ngũ liên hệ và đề xuất giải pháp phù hợp.',
+          services: [
+            'THIẾT KẾ WEBSITE',
+            'THIẾT KẾ SÀN THƯƠNG MẠI ĐIỆN TỬ',
+            'THIẾT KẾ WEB APP',
+            'DỊCH VỤ SEO',
+            'QUẢN TRỊ WEBSITE',
+            'DỊCH VỤ QUẢNG CÁO ĐA KÊNH',
+          ],
+          submitLabel: 'Gửi yêu cầu',
+          successMessage: 'Cảm ơn bạn đã liên hệ. STARTECH sẽ phản hồi trong thời gian sớm nhất.',
+        }),
+        type: 'json',
+      },
     ],
   });
 

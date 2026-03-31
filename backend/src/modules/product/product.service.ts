@@ -26,10 +26,6 @@ export class ProductService {
         },
       },
     },
-  } as const;
-
-  private readonly detailProductInclude = {
-    ...this.listProductInclude,
     product_service: {
       select: {
         id: true,
@@ -41,6 +37,10 @@ export class ProductService {
         },
       },
     },
+  } as const;
+
+  private readonly detailProductInclude = {
+    ...this.listProductInclude,
     images: {
       select: {
         id: true,
@@ -63,7 +63,7 @@ export class ProductService {
       ...product,
       slug: product.slug ?? this.buildSlug(product.name),
       rating: Number(product.rating),
-      price: product.price_Type === 'FIXED' && product.price ? product.price.toFixed(0) : 'Lien he',
+      price: product.price_Type === 'FIXED' && product.price ? product.price.toFixed(0) : 'Liên hệ',
     };
   }
 

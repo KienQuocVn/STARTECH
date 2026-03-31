@@ -1,73 +1,48 @@
-import Image from "next/image";
+import Image from 'next/image'
 
-export function ServicesSection() {
-  const services = [
-    "Thiết kế website",
-    "Thiết kế sàn thương mại điện tử",
-    "Thiết kế Mobile App",
-    "Thiết kế Web App",
-    "Dịch vụ SEO",
-    "Quản trị website",
-    "Hosting - Domain",
-    "Dịch vụ quảng cáo đa kênh",
-    "Thiết kế Branding - Thương hiệu",
-    "Chụp hình thương hiệu",
-    "Đăng ký website với Bộ Công thương",
-  ];
-
+export function ServicesSection({
+  content,
+}: {
+  content: {
+    eyebrow: string
+    title: string
+    imageUrl: string
+    buttonLabel: string
+    buttonHref: string
+    items: string[]
+  }
+}) {
   return (
-    <section className="about-group-3 py-16 md:py-24 bg-gray-50">
+    <section className="bg-gray-50 py-16 md:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* LEFT CONTENT */}
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <h3 className="text-[#1a63a8] text-sm md:text-base uppercase tracking-wider font-medium">
-                Những dịch vụ nổi bật
-              </h3>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-800 leading-tight">
-                Làm việc tận tâm <br className="hidden sm:block" />
-                đã tạo nên uy tín <br className="hidden sm:block" />
-                cho <span className="text-[#1a63a8]">StarTech</span>
-              </h2>
+              <h3 className="text-sm font-medium uppercase tracking-wider text-[#1a63a8] md:text-base">{content.eyebrow}</h3>
+              <h2 className="text-3xl font-semibold leading-tight text-gray-800 sm:text-4xl lg:text-5xl">{content.title}</h2>
             </div>
 
             <ul className="space-y-3">
-              {services.map((service, index) => (
-                <li
-                  key={index}
-                  className="flex items-start justify-center lg:justify-start gap-3 text-gray-700 hover:text-[#1a63a8] transition-colors"
-                >
-                  <span className="text-[#1a63a8] mt-1 flex-shrink-0">▸</span>
+              {content.items.map((service) => (
+                <li key={service} className="flex items-start justify-center gap-3 text-gray-700 transition-colors hover:text-[#1a63a8] lg:justify-start">
+                  <span className="mt-1 flex-shrink-0 text-[#1a63a8]">▸</span>
                   <span className="text-base sm:text-lg">{service}</span>
                 </li>
               ))}
             </ul>
 
             <div className="pt-4">
-              <a
-                href="#"
-                className="inline-block w-full sm:w-auto text-center bg-gradient-to-r from-[#80d8f9] to-[#1a63a8] text-white font-medium px-8 py-3 rounded-full hover:opacity-90 transition-all shadow-md"
-              >
-                Xem tất cả dịch vụ
+              <a href={content.buttonHref} className="inline-block w-full rounded-full bg-gradient-to-r from-[#80d8f9] to-[#1a63a8] px-8 py-3 text-center font-medium text-white shadow-md transition-all hover:opacity-90 sm:w-auto">
+                {content.buttonLabel}
               </a>
             </div>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="relative w-full h-[250px] sm:h-[320px] md:h-[400px] lg:h-[500px] overflow-hidden rounded-xl shadow-lg">
-            <Image
-              src="/img/dich-vu-thiet-ke-website-xay-dung.png"
-              alt="Thiết kế website giới thiệu sản phẩm đẹp, chuyên nghiệp"
-              fill
-              priority
-              sizes="(max-width: 768px) 90vw, (max-width: 1200px) 80vw, 60vw"
-              className="object-contain md:object-cover object-center"
-              quality={90}
-            />
+          <div className="relative h-[250px] w-full overflow-hidden rounded-xl shadow-lg sm:h-[320px] md:h-[400px] lg:h-[500px]">
+            <Image src={content.imageUrl} alt={content.title} fill priority sizes="(max-width: 768px) 90vw, (max-width: 1200px) 80vw, 60vw" className="object-contain object-center md:object-cover" quality={90} />
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

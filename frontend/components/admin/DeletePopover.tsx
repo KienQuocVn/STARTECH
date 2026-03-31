@@ -1,13 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2, AlertCircle } from 'lucide-react'
+import { AlertCircle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
 interface DeletePopoverProps {
   onDelete: () => void | Promise<void>
@@ -29,43 +33,33 @@ export function DeletePopover({ onDelete, itemName }: DeletePopoverProps) {
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <button className="p-1 hover:bg-red-50 text-red-600 rounded transition-colors">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <button className="rounded-full border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50">
           <Trash2 size={18} />
         </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64" align="end">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0 mt-0.5">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-1">Xóa {itemName || 'mục'}</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Bạn có chắc chắn muốn xóa {itemName || 'mục'} này? Hành động này không thể hoàn tác.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsOpen(false)}
-                disabled={isLoading}
-              >
-                Hủy
-              </Button>
-              <Button
-                size="sm"
-                className="bg-red-600 hover:bg-red-700 text-white"
-                onClick={handleDelete}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Đang xóa...' : 'Xóa'}
-              </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md rounded-[28px] border-slate-200 p-0">
+        <div className="p-6">
+          <DialogHeader className="text-left">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+              <AlertCircle className="h-6 w-6" />
             </div>
-          </div>
+            <DialogTitle className="text-xl text-slate-950">Xác nhận xóa</DialogTitle>
+            <DialogDescription className="text-sm leading-6 text-slate-600">
+              Bạn có chắc muốn xóa <span className="font-semibold text-slate-900">{itemName || 'mục này'}</span> không? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
+              Hủy
+            </Button>
+            <Button className="bg-red-600 text-white hover:bg-red-700" onClick={handleDelete} disabled={isLoading}>
+              {isLoading ? 'Đang xóa...' : 'Xác nhận xóa'}
+            </Button>
+          </DialogFooter>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -65,7 +65,7 @@ GOOGLE_SERVICE_ACCOUNT_KEY_BASE64=
 ## 5. Bien moi truong frontend
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3001
+NEXT_PUBLIC_API_BASE_URL=/api/v1
 API_BASE_URL=http://127.0.0.1:3001
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
@@ -73,6 +73,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 Ghi chu:
 
 - `NEXT_PUBLIC_API_BASE_URL` dung cho client-side fetch.
+  O local Next.js nen de `/api/v1` de browser di qua rewrite cua frontend, tranh loi do goi truc tiep sai host/port.
 - `API_BASE_URL` dung cho server-side fetch trong Next.js.
 - `NEXT_PUBLIC_SITE_URL` dung de tao canonical URL, sitemap va metadata SEO.
 
