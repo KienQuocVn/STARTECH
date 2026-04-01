@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import Image from 'next/image';
 
 const testimonials = [
   {
@@ -57,9 +58,11 @@ export function TestimonialsSection() {
             </p>
 
             <div className="flex items-center gap-4 sm:gap-6">
-              <img
+              <Image
                 src={currentTestimonial.image}
                 alt={currentTestimonial.name}
+                width={64}
+                height={64}
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-4 border-white shadow-md"
               />
               <div>
@@ -89,9 +92,11 @@ export function TestimonialsSection() {
 
           {/* Hình ảnh minh họa */}
           <div className="rounded-2xl overflow-hidden shadow-2xl max-h-[400px] sm:max-h-[500px] lg:max-h-full">
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop"
               alt="Team working"
+              width={800}
+              height={600}
               className="w-full h-full object-cover"
             />
           </div>

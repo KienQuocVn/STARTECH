@@ -8,11 +8,15 @@ import { SlideOver } from '@/components/admin/SlideOver'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
+  approveAdminSitePage,
   createAdminSitePage,
   deleteAdminFaq,
   deleteAdminPageSection,
   deleteAdminSitePage,
   getAdminSitePages,
+  publishAdminSitePage,
+  requestChangesAdminSitePage,
+  submitAdminSitePageForReview,
   updateAdminSitePage,
   upsertAdminFaq,
   upsertAdminPageSection,
@@ -54,6 +58,27 @@ type FaqFormState = {
   displayOrder: string
 }
 
+const sectionTemplates = {
+  hero: {
+    bullets: ['Gia tri 1', 'Gia tri 2', 'Gia tri 3'],
+    mediaType: 'image',
+    mediaUrl: '/img/website-design-team.png',
+  },
+  stats: {
+    items: [
+      { title: 'Chi so 1', value: '24/7', description: 'Mo ta ngan cho chi so 1' },
+      { title: 'Chi so 2', value: '100%', description: 'Mo ta ngan cho chi so 2' },
+      { title: 'Chi so 3', value: 'CMS', description: 'Mo ta ngan cho chi so 3' },
+    ],
+  },
+  cards: {
+    items: [
+      { title: 'Card 1', description: 'Mo ta card 1', imageUrl: '/modern-corporate-website.png', href: '/lien-he' },
+      { title: 'Card 2', description: 'Mo ta card 2', imageUrl: '/modern-ecommerce-website.png', href: '/du-an' },
+    ],
+  },
+} as const
+
 function buildPageForm(page?: SitePageContent | null): PageFormState {
   return {
     slug: page?.slug ?? '',
@@ -92,6 +117,21 @@ function buildFaqForm(faq?: SiteFaqItem | null): FaqFormState {
   }
 }
 
+function formatWorkflowStatus(status?: SitePageContent['workflowStatus']) {
+  switch (status) {
+    case 'IN_REVIEW':
+      return 'In review'
+    case 'APPROVED':
+      return 'Approved'
+    case 'PUBLISHED':
+      return 'Published'
+    case 'CHANGES_REQUESTED':
+      return 'Changes requested'
+    default:
+      return 'Draft'
+  }
+}
+
 export default function ContentPage() {
   const [pages, setPages] = useState<SitePageContent[]>([])
   const [selectedPageId, setSelectedPageId] = useState<number | null>(null)
@@ -104,6 +144,7 @@ export default function ContentPage() {
   const [faqForm, setFaqForm] = useState<FaqFormState>(buildFaqForm())
   const [editingPage, setEditingPage] = useState<SitePageContent | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [workflowNotes, setWorkflowNotes] = useState('')
 
   const loadPages = async () => {
     const response = await getAdminSitePages()
@@ -210,6 +251,17 @@ export default function ContentPage() {
     }
   }
 
+  const runWorkflowAction = async (action: () => Promise<unknown>, successMessage: string) => {
+    try {
+      await action()
+      await loadPages()
+      setWorkflowNotes('')
+      toast.success(successMessage)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Khong the thuc hien workflow action')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -252,6 +304,9 @@ export default function ContentPage() {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">{selectedPage.title}</h2>
                     <p className="text-sm text-gray-500">/{selectedPage.slug}</p>
+                    <div className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
+                      {formatWorkflowStatus(selectedPage.workflowStatus)}
+                    </div>
                     <p className="mt-3 text-sm text-gray-600">{selectedPage.seoDescription || 'Chua co mo ta SEO.'}</p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -275,6 +330,49 @@ export default function ContentPage() {
                     />
                   </div>
                 </div>
+                <div className="mt-6 space-y-3">
+                  <textarea
+                    value={workflowNotes}
+                    onChange={(event) => setWorkflowNotes(event.target.value)}
+                    className="min-h-20 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="Workflow notes cho review, approve hoac publish"
+                  />
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => runWorkflowAction(() => submitAdminSitePageForReview(selectedPage.id, workflowNotes), 'Da gui page di review')}
+                    >
+                      Submit review
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => runWorkflowAction(() => requestChangesAdminSitePage(selectedPage.id, workflowNotes), 'Da chuyen page ve changes requested')}
+                    >
+                      Request changes
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => runWorkflowAction(() => approveAdminSitePage(selectedPage.id, workflowNotes), 'Da approve page')}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      onClick={() => runWorkflowAction(() => publishAdminSitePage(selectedPage.id, workflowNotes), 'Da publish page')}
+                    >
+                      Publish live
+                    </Button>
+                  </div>
+                </div>
+                {selectedPage.versions?.length ? (
+                  <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+                    {selectedPage.versions.map((version) => (
+                      <div key={version.id} className="flex items-center justify-between border-b border-slate-200 py-2 last:border-b-0">
+                        <span>v{version.versionNumber}</span>
+                        <span>{formatWorkflowStatus(version.workflowStatus)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </Card>
 
               <Card className="p-6">
@@ -424,6 +522,20 @@ export default function ContentPage() {
 
       <SlideOver isOpen={isSectionOpen} onClose={() => setIsSectionOpen(false)} title={sectionForm.id ? 'Cập nhật section' : 'Thêm section'} size="md">
         <div className="space-y-4">
+          <div>
+            <label className="text-sm font-semibold text-gray-900">Template JSON</label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={() => setSectionForm((prev) => ({ ...prev, contentJson: JSON.stringify(sectionTemplates.hero, null, 2) }))}>
+                Hero
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setSectionForm((prev) => ({ ...prev, contentJson: JSON.stringify(sectionTemplates.stats, null, 2) }))}>
+                Stats
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setSectionForm((prev) => ({ ...prev, contentJson: JSON.stringify(sectionTemplates.cards, null, 2) }))}>
+                Cards
+              </Button>
+            </div>
+          </div>
           {(['sectionKey', 'Tiêu đề', 'Phụ đề', 'URL hình ảnh', 'primaryButtonLabel', 'primaryButtonHref', 'secondaryButtonLabel', 'secondaryButtonHref', 'displayOrder'] as Array<keyof SectionFormState>).map((field) => (
             <div key={field}>
               <label className="text-sm font-semibold capitalize text-gray-900">{field}</label>

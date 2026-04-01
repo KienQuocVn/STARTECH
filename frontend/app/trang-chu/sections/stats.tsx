@@ -8,6 +8,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { HomeStatItem } from '@/lib/content/homepage';
+import Image from 'next/image';
 
 interface StatsProps {
   items: HomeStatItem[];
@@ -25,7 +26,7 @@ export function Stats({ items }: StatsProps) {
                   <div className="h-full rounded-2xl border bg-gradient-to-b from-white to-[#46DFB1]/5 p-5 shadow-sm sm:p-6">
                     <div className="flex items-start gap-3">
                       <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#00A1A6]/10 sm:h-11 sm:w-11">
-                        <img src={item.icon} alt={item.label} className="h-5 w-5 object-contain sm:h-6 sm:w-6" />
+                        <Image src={item.icon} alt={item.label} width={24} height={24} className="h-5 w-5 object-contain sm:h-6 sm:w-6" />
                       </span>
                       <div className="flex-1">
                         <div className="text-[11px] uppercase tracking-[0.18em] text-[#286478] sm:text-xs">
@@ -51,7 +52,7 @@ export function Stats({ items }: StatsProps) {
             <div key={`${item.label}-${idx}`} className="rounded-2xl border bg-gradient-to-b from-white to-[#46DFB1]/5 p-5 lg:p-6">
               <div className="flex items-start gap-3">
                 <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#00A1A6]/10 lg:h-11 lg:w-11">
-                  <img src={item.icon} alt={item.label} className="h-5 w-5 object-contain lg:h-6 lg:w-6" />
+                  <Image src={item.icon} alt={item.label} width={24} height={24} className="h-5 w-5 object-contain lg:h-6 lg:w-6" />
                 </span>
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-[#286478] lg:text-sm">{item.label}</div>

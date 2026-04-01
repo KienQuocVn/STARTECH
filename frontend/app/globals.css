@@ -99,6 +99,19 @@
   --brand-border: rgba(26, 99, 168, 0.14);
   --brand-gradient: linear-gradient(135deg, #80d8f9 0%, #1a63a8 100%);
   --brand-gradient-soft: radial-gradient(circle at top, rgba(128, 216, 249, 0.18), rgba(255, 255, 255, 0.98) 42%, #ffffff 78%);
+  --surface-page: #ffffff;
+  --surface-subtle: #f4f9fd;
+  --surface-elevated: #ffffff;
+  --surface-accent: #d9f3ff;
+  --text-strong: #183b56;
+  --text-body: #36586d;
+  --text-muted: #5c788b;
+  --border-subtle: rgba(26, 99, 168, 0.12);
+  --border-strong: rgba(26, 99, 168, 0.22);
+  --hero-gradient: linear-gradient(180deg, rgba(128, 216, 249, 0.18) 0%, rgba(255, 255, 255, 0.96) 68%);
+  --section-gradient: linear-gradient(180deg, rgba(217, 243, 255, 0.28) 0%, rgba(255, 255, 255, 1) 100%);
+  --shadow-soft: 0 18px 50px rgba(17, 70, 111, 0.08);
+  --space-section: clamp(4rem, 6vw, 6rem);
 }
 
 .dark {
@@ -195,5 +208,21 @@
 
   .brand-soft-bg {
     background-image: var(--brand-gradient-soft);
+  }
+
+  .section-shell {
+    background: var(--surface-page);
+    padding-block: var(--space-section);
+  }
+
+  .section-shell-muted {
+    background: var(--section-gradient);
+    padding-block: var(--space-section);
+  }
+
+  .panel-elevated {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
   }
 }

@@ -176,6 +176,14 @@ enum UserRole {
   VIEWER
 }
 
+enum ContentWorkflowStatus {
+  DRAFT
+  IN_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+  PUBLISHED
+}
+
 model SitePage {
   id              Int           @id @default(autoincrement())
   slug            String        @unique @db.VarChar(191)
@@ -185,6 +193,11 @@ model SitePage {
   heroBadge       String?       @map("hero_badge") @db.VarChar(191)
   heroTitle       String?       @map("hero_title") @db.VarChar(255)
   heroDescription String?       @map("hero_description") @db.Text
+  workflowStatus  ContentWorkflowStatus @default(DRAFT) @map("workflow_status")
+  publishedVersionId Int?       @unique @map("published_version_id")
+  submittedAt     DateTime?     @map("submitted_at") @db.DateTime(0)
+  approvedAt      DateTime?     @map("approved_at") @db.DateTime(0)
+  publishedAt     DateTime?     @map("published_at") @db.DateTime(0)
   createdBy       String?       @map("created_by") @db.VarChar(191)
   updatedBy       String?       @map("updated_by") @db.VarChar(191)
   deletedAt       DateTime?     @map("deleted_at") @db.DateTime(0)
@@ -192,8 +205,11 @@ model SitePage {
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.DateTime(0)
   sections        PageSection[]
   faqs            FaqItem[]
+  versions        SitePageVersion[]
+  publishedVersion SitePageVersion? @relation("PublishedSitePageVersion", fields: [publishedVersionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([slug], map: "site_page_slug_idx")
+  @@index([workflowStatus], map: "site_page_workflow_status_idx")
   @@map("site_page")
 }
 
@@ -303,4 +319,39 @@ model MediaAsset {
 
   @@index([mimeType], map: "media_asset_mime_type_idx")
   @@map("media_asset")
+}
+
+model SitePageVersion {
+  id            Int                   @id @default(autoincrement())
+  pageId         Int                   @map("page_id")
+  versionNumber  Int                   @map("version_number")
+  workflowStatus ContentWorkflowStatus @map("workflow_status")
+  snapshotJson   Json                  @map("snapshot_json")
+  notes          String?               @db.Text
+  approvedBy     String?               @map("approved_by") @db.VarChar(191)
+  publishedBy    String?               @map("published_by") @db.VarChar(191)
+  createdAt      DateTime              @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt      DateTime              @updatedAt @map("updated_at") @db.DateTime(0)
+
+  page             SitePage  @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  publishedForPage SitePage? @relation("PublishedSitePageVersion")
+
+  @@unique([pageId, versionNumber], map: "site_page_version_page_version_unique")
+  @@index([pageId], map: "site_page_version_page_idx")
+  @@index([workflowStatus], map: "site_page_version_status_idx")
+  @@map("site_page_version")
+}
+
+model ContentAuditLog {
+  id         Int      @id @default(autoincrement())
+  entityType String   @map("entity_type") @db.VarChar(100)
+  entityId   String?  @map("entity_id") @db.VarChar(191)
+  action     String   @db.VarChar(100)
+  actorId    String?  @map("actor_id") @db.VarChar(191)
+  metadata   Json?    @map("metadata")
+  createdAt  DateTime @default(now()) @map("created_at") @db.DateTime(0)
+
+  @@index([entityType, entityId], map: "content_audit_entity_idx")
+  @@index([action], map: "content_audit_action_idx")
+  @@map("content_audit_log")
 }

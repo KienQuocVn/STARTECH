@@ -6,6 +6,7 @@ export type SiteFaqItem = {
   question: string
   answer: string
   displayOrder: number
+  isActive?: boolean
 }
 
 export type SitePageSection = {
@@ -21,6 +22,15 @@ export type SitePageSection = {
   secondaryButtonHref?: string | null
   contentJson?: unknown
   displayOrder: number
+  isActive?: boolean
+}
+
+export type SitePageVersion = {
+  id: number
+  versionNumber: number
+  workflowStatus: 'DRAFT' | 'IN_REVIEW' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED'
+  notes?: string | null
+  createdAt: string
 }
 
 export type SitePageContent = {
@@ -32,8 +42,14 @@ export type SitePageContent = {
   heroBadge?: string | null
   heroTitle?: string | null
   heroDescription?: string | null
+  workflowStatus?: 'DRAFT' | 'IN_REVIEW' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED'
+  publishedVersionId?: number | null
+  submittedAt?: string | null
+  approvedAt?: string | null
+  publishedAt?: string | null
   sections: SitePageSection[]
   faqs: SiteFaqItem[]
+  versions?: SitePageVersion[]
 }
 
 export type SitePageResponse = {
@@ -101,4 +117,30 @@ export async function deleteAdminFaq(id: number) {
     method: 'DELETE',
     headers: getAdminAuthHeaders(),
   })
+}
+
+async function postWorkflowAction(id: number, action: 'submit-review' | 'approve' | 'request-changes' | 'publish', notes?: string) {
+  return apiClient.post<{ success: boolean; data: SitePageContent }, { notes?: string }>(
+    `/site-content/page/${id}/${action}`,
+    notes ? { notes } : {},
+    {
+      headers: getAdminAuthHeaders(),
+    },
+  )
+}
+
+export async function submitAdminSitePageForReview(id: number, notes?: string) {
+  return postWorkflowAction(id, 'submit-review', notes)
+}
+
+export async function approveAdminSitePage(id: number, notes?: string) {
+  return postWorkflowAction(id, 'approve', notes)
+}
+
+export async function requestChangesAdminSitePage(id: number, notes?: string) {
+  return postWorkflowAction(id, 'request-changes', notes)
+}
+
+export async function publishAdminSitePage(id: number, notes?: string) {
+  return postWorkflowAction(id, 'publish', notes)
 }

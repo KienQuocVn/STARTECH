@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
 import type { HomeServiceItem } from '@/lib/content/homepage';
+import Image from 'next/image';
 
 interface ServicesProps {
   eyebrow: string;
@@ -22,11 +23,7 @@ export function Services({ eyebrow, title, image, items }: ServicesProps) {
         <div className="relative mx-auto mt-10 max-w-5xl" data-reveal>
           <Card className="overflow-hidden rounded-[28px] shadow-xl">
             <div className="relative">
-              <img
-                src={image}
-                alt={title}
-                className="h-auto w-full object-cover"
-              />
+              <Image src={image} alt={title} width={1200} height={720} className="h-auto w-full object-cover" />
             </div>
           </Card>
         </div>
@@ -40,7 +37,7 @@ export function Services({ eyebrow, title, image, items }: ServicesProps) {
               data-delay={index * 0.05}
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#00A1A6]/10 sm:h-12 sm:w-12">
-                <img src={item.icon} alt={item.title} className="h-5 w-5 object-contain sm:h-6 sm:w-6" />
+                <Image src={item.icon} alt={item.title} width={24} height={24} className="h-5 w-5 object-contain sm:h-6 sm:w-6" />
               </div>
               <div className="text-lg font-semibold leading-snug text-[#2F4858] sm:text-xl">{item.title}</div>
               <p className="text-sm leading-7 text-[#286478] sm:text-[15px]">{item.description}</p>

@@ -1,7 +1,15 @@
 import type { Metadata } from 'next';
 import { buildMetadataFromPageContent } from '@/lib/seo';
+import { resolveServicesPageData } from '@/lib/content/marketing-pages';
 import { getSitePageContent } from '@/lib/services/site-content';
-import ServicesPageClient from './services-page-client';
+import {
+  MarketingCardsSection,
+  MarketingCtaSection,
+  MarketingFaqSection,
+  MarketingHeroSection,
+  MarketingProcessSection,
+  MarketingStatsSection,
+} from '@/components/site/marketing-sections';
 
 export async function generateMetadata(): Promise<Metadata> {
   const pageContent = await getSitePageContent('dich-vu').catch(() => null);
@@ -13,6 +21,19 @@ export async function generateMetadata(): Promise<Metadata> {
   }, { pathname: '/dich-vu' });
 }
 
-export default function ServicesPage() {
-  return <ServicesPageClient />;
+export default async function ServicesPage() {
+  const pageContent = await getSitePageContent('dich-vu').catch(() => null)
+  const content = resolveServicesPageData(pageContent?.data)
+
+  return (
+    <div className="w-full overflow-hidden bg-background">
+      <MarketingHeroSection hero={content.hero} />
+      <MarketingStatsSection items={content.stats} />
+      <MarketingCardsSection intro={content.featureIntro} items={content.features} />
+      <MarketingProcessSection intro={content.processIntro} items={content.process} />
+      <MarketingCardsSection intro={content.showcaseIntro} items={content.showcase} variant="showcase" />
+      <MarketingCtaSection cta={content.cta} />
+      <MarketingFaqSection items={content.faqs} />
+    </div>
+  )
 }

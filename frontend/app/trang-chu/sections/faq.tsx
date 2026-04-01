@@ -2,6 +2,7 @@
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import type { SiteFaqItem } from "@/lib/services/site-content"
+import Image from "next/image"
 
 const fallbackFaqs = [
   { q: "STARTECH cung cap dich vu gi?", a: "Thiet ke website, thuong mai dien tu, phat trien ung dung va tu dong hoa marketing." },
@@ -32,7 +33,7 @@ export function FAQ({ items = [] }: FAQProps) {
           </Accordion>
         </div>
         <div className="order-1 md:order-2">
-          <img src="/img/professional-web-design-team.jpg" alt="STARTECH team" className="rounded-2xl shadow-md" />
+          <Image src="/img/professional-web-design-team.jpg" alt="STARTECH team" width={900} height={700} className="rounded-2xl shadow-md" />
         </div>
       </div>
     </section>

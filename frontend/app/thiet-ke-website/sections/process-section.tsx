@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 
 const steps = [
   {
@@ -86,11 +87,12 @@ export function ProcessSection() {
               </p>
 
               <div className="rounded-2xl overflow-hidden">
-                <img
+                <Image
                   src={step.iconPath}
                   alt={step.title}
+                  width={640}
+                  height={420}
                   className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
                 />
               </div>
             </div>

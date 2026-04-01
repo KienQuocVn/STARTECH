@@ -13,6 +13,14 @@ function toSlug(value: string) {
 }
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Seed script bi chan trong production environment.');
+  }
+
+  if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+    throw new Error('Seed script yeu cau ALLOW_DESTRUCTIVE_SEED=true vi se xoa du lieu hien co.');
+  }
+
   prisma.$use(async (params, next) => {
     if (params.model === 'product' && params.action === 'create') {
       const name = params.args?.data?.name;

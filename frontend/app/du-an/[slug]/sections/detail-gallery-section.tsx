@@ -146,11 +146,12 @@ export default function ProjectDetailPage({ project, categories = [] }: ProjectD
                         i === index ? 'ring-2 ring-[#1a63a8]' : ''
                       }`}
                     >
-                      <img
+                      <Image
                         src={src}
                         alt={`thumb-${i}`}
+                        width={240}
+                        height={160}
                         className="w-full h-40 object-cover"
-                        loading="lazy"
                       />
                     </button>
                   </div>

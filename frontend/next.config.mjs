@@ -15,8 +15,47 @@ const backendBaseUrl = normalizeApiBaseUrl(
 
 const nextConfig = {
   images: {
-    unoptimized: true,
     qualities: [75, 85, 90],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '3001',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3001',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.worldvectorlogo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.svgrepo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn3d.iconscout.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'p7.hiclipart.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'docs.nestjs.com',
+      },
+    ],
   },
 
   async rewrites() {

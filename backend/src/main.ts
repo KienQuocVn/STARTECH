@@ -17,6 +17,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: winstonLogger,
   });
+  const isProduction = process.env.NODE_ENV === 'production';
   const uploadsDir = join(process.cwd(), 'uploads');
 
   if (!existsSync(uploadsDir)) {
@@ -75,12 +76,14 @@ async function bootstrap() {
     .addTag('Health', 'Health check')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+  if (!isProduction) {
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+  }
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
@@ -91,7 +94,9 @@ async function bootstrap() {
   }
 
   console.log(`Server running at http://localhost:${port}`);
-  console.log(`Swagger docs at http://localhost:${port}/api/docs`);
+  if (!isProduction) {
+    console.log(`Swagger docs at http://localhost:${port}/api/docs`);
+  }
   console.log(`API base at http://localhost:${port}/api/v1`);
   console.log(`Health check at http://localhost:${port}/health`);
 }

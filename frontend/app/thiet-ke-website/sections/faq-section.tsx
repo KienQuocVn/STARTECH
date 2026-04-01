@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { SiteFaqItem } from "@/lib/services/site-content";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 const fallbackFaqs = [
   {
@@ -67,8 +68,8 @@ export function FAQSection({ items = [] }: FAQSectionProps) {
               <AccordionTrigger className="px-5 sm:px-6 py-4 sm:py-5 text-left font-semibold text-gray-800 text-base sm:text-lg hover:no-underline focus:outline-none transition-all data-[state=open]:bg-gradient-to-r data-[state=open]:from-[#1a63a8] data-[state=open]:to-[#70caef] data-[state=open]:text-white rounded-t-2xl">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-5 sm:px-6 pb-5 text-gray-700 text-sm sm:text-base leading-relaxed">
-                <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+              <AccordionContent className="px-5 sm:px-6 pb-5 text-gray-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                {sanitizeRichText(faq.answer)}
               </AccordionContent>
             </AccordionItem>
           ))}

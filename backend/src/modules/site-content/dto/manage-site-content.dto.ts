@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsInt, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { ContentWorkflowStatus } from '@prisma/client';
 
 export class CreateSitePageDto {
   @ApiProperty({ example: 'home' })
@@ -41,6 +42,18 @@ export class CreateSitePageDto {
 }
 
 export class UpdateSitePageDto extends PartialType(CreateSitePageDto) {}
+
+export class ReviewSitePageDto {
+  @ApiPropertyOptional({ enum: ContentWorkflowStatus, example: ContentWorkflowStatus.IN_REVIEW })
+  @IsOptional()
+  @IsEnum(ContentWorkflowStatus)
+  status?: ContentWorkflowStatus;
+
+  @ApiPropertyOptional({ example: 'Noi dung da san sang de review.' })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
 
 export class UpsertPageSectionDto {
   @ApiPropertyOptional({ example: 1 })

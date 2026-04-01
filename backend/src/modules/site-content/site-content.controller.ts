@@ -5,7 +5,13 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Permissions } from '../auth/permissions.decorator';
-import { CreateSitePageDto, UpdateSitePageDto, UpsertFaqItemDto, UpsertPageSectionDto } from './dto/manage-site-content.dto';
+import {
+  CreateSitePageDto,
+  ReviewSitePageDto,
+  UpdateSitePageDto,
+  UpsertFaqItemDto,
+  UpsertPageSectionDto,
+} from './dto/manage-site-content.dto';
 
 @ApiTags('Site Content')
 @Controller('site-content')
@@ -89,5 +95,41 @@ export class SiteContentController {
   @ApiOperation({ summary: 'Xoa FAQ admin' })
   removeFaq(@Param('id', ParseIntPipe) id: number) {
     return this.siteContentService.removeFaq(id);
+  }
+
+  @Post('page/:id/submit-review')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN', 'EDITOR')
+  @Permissions('content.write')
+  @ApiOperation({ summary: 'Gui page vao quy trinh review' })
+  submitPageForReview(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.submitPageForReview(id, dto);
+  }
+
+  @Post('page/:id/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
+  @Permissions('content.write')
+  @ApiOperation({ summary: 'Phe duyet page content' })
+  approvePage(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.approvePage(id, dto);
+  }
+
+  @Post('page/:id/request-changes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
+  @Permissions('content.write')
+  @ApiOperation({ summary: 'Yeu cau cap nhat lai noi dung page' })
+  requestChanges(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.requestChanges(id, dto);
+  }
+
+  @Post('page/:id/publish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
+  @Permissions('content.write')
+  @ApiOperation({ summary: 'Publish page content len public site' })
+  publishPage(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.publishPage(id, dto);
   }
 }

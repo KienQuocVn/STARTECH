@@ -1,6 +1,7 @@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 
 const templates = [
   { image: "/modern-ecommerce-website.png" },
@@ -24,7 +25,9 @@ export function Ecosystem() {
               {templates.map((tpl, i) => (
                 <CarouselItem key={i} className="basis-[86%] sm:basis-1/2 lg:basis-1/3">
                   <div className="group relative overflow-hidden rounded-3xl bg-white shadow-lg">
-                    <img src={tpl.image} className="h-[260px] w-full object-cover sm:h-[320px] lg:h-[360px]" />
+                    <div className="relative h-[260px] w-full sm:h-[320px] lg:h-[360px]">
+                      <Image src={tpl.image} alt={`Template ${i + 1}`} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
+                    </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                       <div className="flex flex-col gap-3">
                         <Button asChild size="sm" className="bg-white text-[#1a63a8] hover:bg-white/90">

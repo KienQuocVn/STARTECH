@@ -1,49 +1,65 @@
-## Phase 3 - Backend Hardening & Frontend Standards
-### Cap nhat
+﻿# Phase 3 - Backend Hardening & Frontend Standards
 
-- [~] Legacy model naming van chua duoc chuan hoa tron ven.
-  Application layer da duoc bo sung permission matrix va business-event logging, nhung schema legacy (`product`, `services`, `contact_submission`...) van chua duoc migration dong bo sang naming PascalCase.
+## Cap nhat hien trang
 
----
-
-## Phase 4 - Dynamic Content & Admin Foundation
-
-### Cap nhat
-
-- [~] Permission granularity vuot qua enum role co ban.
-  Da co permission matrix (`product.write`, `content.delete`, `settings.read`...) va guard check theo permission ben canh role.
-  Chua co permission tables trong DB va chua co UI quan tri permission dong.
-- [~] Refactor dan service cu dang return object thu cong.
-  Cac module admin moi cham den da duoc day ve pattern exception/structured response ro hon, nhung nhieu service legacy van can refactor tiep.
-- [ ] Hoan thien workflow publish/content approval neu can.
-  Hien tai admin da CRUD truc tiep du lieu that va co `isActive` cho section/faq, nhung chua co workflow approve/publish rieng theo role o cap page/content lifecycle.
+- [~] Auth admin da co JWT + refresh token + cookie flow.
+  Nen tang da co, nhung login UI van lo credential seed va can nghiem thu lai tren staging.
+- [~] Permission matrix da co o app layer.
+  Da co role + permission guard, nhung chua co audit trail DB va chua co UI quan ly permission dong.
+- [ ] Swagger docs duoc an tren production.
+  Hien van dang bat cong khai tai `/api/docs`.
+- [~] Frontend standardization.
+  Da co `next/image` o nhieu cho, nhung van con nhieu the `img` thuong va mau sac hardcode.
+- [ ] README/backend va tai lieu van hanh duoc chuan hoa.
+  Hien README backend van la template Nest mac dinh.
 
 ---
 
-## Phase 5 - CMS & Production Hardening
+# Phase 4 - Dynamic Content & Admin Foundation
 
-### Dang tiep tuc
+## Cap nhat hien trang
 
-- [~] Production deploy docs.
-  Da co `docs/public-deploy-audit.md` va checklist deploy co ban.
-  Van can bo sung tai lieu env production, rollback, WAF/CDN, va cach tat/gioi han Swagger khi public.
-- [ ] CDN/caching strategy cho asset nang va `.spline`.
-- [~] Monitoring, backup, alerting.
-  Da co `/health` cho backend, `/api/health` cho frontend va `BusinessEventsService` de lam baseline smoke/uptime/business log.
-  Alerting, dashboard observability, backup va on-call production van chua duoc thiet lap.
-- [~] Build verification.
-  Frontend production build, frontend SEO metadata test va backend build da chay duoc.
-  Van can don warning frontend (`img`, `alt`, bien khong dung) va bo sung auth/admin e2e smoke test.
-- [ ] Production security cleanup.
-  Can loai bo seed credentials khoi login UI, bo fallback `JWT_SECRET` / admin password trong production path, va dong hoac gioi han `/api/docs`.
-
-### Ghi chu kiem chung
-
-- Frontend SEO metadata test script: `npm --prefix frontend test`
-- Frontend production build: `npm --prefix frontend run build`
-- Frontend type-check: `npx --prefix frontend tsc --noEmit -p frontend/tsconfig.json`
-- Backend build: `npm --prefix backend run build`
-- Backend lint: `npm --prefix backend run lint`
-- Backend unit test hien van do do bo spec legacy chua duoc cap nhat dong bo voi codebase moi.
+- [x] Admin dashboard da co va doc du lieu that tu backend.
+- [x] Portfolio CRUD da noi backend va co bo loc/pagination trong admin.
+- [x] Leads, showcase, services, settings, feedback, site-content da co API va man quan ly co ban.
+- [~] CMS-driven public pages.
+  `trang-chu` va `gioi-thieu` da dung CMS mot phan; `dich-vu`, `du-an`, `thiet-ke-website` chua duoc admin hoa toan bo.
+- [~] Public settings-driven layout.
+  Navbar/Footer da doc `SiteSetting`, nhung phan section content van chua dong bo hoan toan.
+- [ ] Workflow publish/content approval.
+  Chua co draft/live approval cho page content.
 
 ---
+
+# Phase 5 - CMS & Production Hardening
+
+## Uu tien hien tai
+
+- [ ] Go thong tin tai khoan seed khoi giao dien login.
+- [ ] Ra soat `prisma/seed.ts` de tranh xoa du lieu khi van hanh production.
+- [ ] Chot file env production cho frontend/backend.
+- [ ] Nghiem thu lai full luong admin:
+  login, refresh, logout, CRUD du an, CRUD content, upload media, cap nhat settings.
+- [ ] Chuyen cac diem dung `img` quan trong sang `next/image`.
+- [ ] Giam hardcode o cac page `dich-vu` va `thiet-ke-website`, dua noi dung ve CMS.
+- [ ] Thiet lap backup, monitoring, alerting, cache/CDN cho production.
+
+## Kiem chung hien co
+
+- [x] Frontend SEO test PASS: `npm test` trong `frontend`.
+- [x] Rewrite frontend -> backend da duoc cau hinh trong Next.js.
+- [~] Build/lint/typecheck full repo.
+  Chua chot lai toan bo trong turn nay vi da tam dung theo yeu cau.
+- [~] Deploy readiness.
+  San sang cho staging/demo, chua nen danh dau public-production-ready.
+
+---
+
+# Ket luan roadmap
+
+Huong di tiep theo khuyen nghi:
+
+1. Chot P0 production hardening.
+2. Day staging va nghiem thu full flow admin/public.
+3. Mo rong CMS cho cac section dang hardcode.
+4. Sau khi on dinh moi toi uu them test, audit trail va workflow xet duyet noi dung.

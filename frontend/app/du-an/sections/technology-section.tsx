@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function TechnologySection() {
   const technologies = [
@@ -119,12 +120,15 @@ export default function TechnologySection() {
                 
                 <div className="relative z-10 text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/90 dark:bg-white/10 shadow-lg mb-3 p-2">
-                    <img 
+                    <Image
                       src={tech.icon} 
                       alt={tech.name}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 object-contain"
+                      unoptimized={tech.icon.startsWith('data:')}
                       onError={(e) => {
-                        const target = e.target as HTMLImageElement;
+                        const target = e.currentTarget as HTMLImageElement;
                         target.style.display = 'none';
                         const parent = target.parentElement;
                         if (parent) {
