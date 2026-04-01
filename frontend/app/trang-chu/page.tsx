@@ -12,9 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildMetadataFromPageContent(
     response?.data,
     {
-      title: 'STARTECH - Doi moi cong nghe, toi da hieu qua',
+      title: 'STARTECH - Đổi mới công nghệ, tối đa hiệu quả',
       description:
-        'STARTECH cung cap giai phap cong nghe hien dai: thiet ke website, thuong mai dien tu, phat trien ung dung va tu dong hoa marketing.',
+        'STARTECH cung cấp giải pháp công nghệ hiện đại: thiết kế website, thương mại điện tử, phát triển ứng dụng và tự động hóa marketing.',
     },
     { pathname: '/trang-chu' },
   );
