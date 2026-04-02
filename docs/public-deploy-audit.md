@@ -11,77 +11,12 @@ Tai lieu nay tong hop:
 
 ## 2. Nhung gi da duoc lam trong dot nay
 
-### Da sua trong code
-
-- Sua loi `admin/portfolio` khong load du lieu do frontend gui `limit=200` trong khi backend chi chap nhan toi da `100`.
-- Them helper lay toan bo portfolio theo nhieu trang de admin va sitemap khong bi gioi han 100 item.
-- Sua `sitemap.xml` de lay du lieu portfolio an toan, khong bi `400` validation.
-- Bo `eslint.ignoreDuringBuilds` va `typescript.ignoreBuildErrors` khoi `frontend/next.config.mjs` de frontend quay lai build theo loi that.
-- Chuyen login/logout admin sang session flow qua `frontend/app/api/admin/session/route.ts`, set cookie thay vi ghi token vao `localStorage`.
-- Cap nhat backend `JwtStrategy` de nhan JWT tu cookie `startech_admin_token`, khong chi tu header Bearer.
-- Bo sung `Content-Security-Policy` co ban trong `frontend/middleware.ts`.
-- Tao component dung chung `ConversionBand` va gan vao `trang-chu`, `dich-vu`, `du-an` de CTA "Nhan bao gia" / "Dat lich tu van" va trust signal nhat quan hon.
-- Chuan hoa them token brand trong `frontend/app/globals.css` gom:
-  - `--brand-primary`
-  - `--brand-secondary`
-  - `--brand-surface`
-  - `--brand-gradient`
-- Tao skeleton loading moi cho cac route co `loading.tsx` va ap dung `animate-pulse`.
-- Dong bo palette xanh duong theo 2 mau chu dao:
-  - `#1a63a8`
-  - `#80d8f9`
-- Bo sung token mau `brand-*` de admin UI dung dung mau va de maintain hon.
-- An nut hamburger tren desktop o navbar de bo cuc sach hon.
-- Them mot lop response security headers trong Next middleware.
-- Gioi han upload media: chi cho phep hinh anh va toi da `5MB`.
-
-### Da verify
-
-- Frontend lint: `PASS` nhung con warning ve `img`, `alt`, va mot so bien chua dung.
-- Frontend SEO metadata test: `PASS`
-- Backend build: `PASS`
-- Backend lint: `PASS` voi `1` warning legacy chua dung (`contact.service.spec.ts`).
-- Frontend production build: `PASS`
-  - Build production da chay xong thanh cong.
-  - Con nhieu warning production lien quan den `img`, `alt`, va bien khong dung, can don tiep de toi uu chat luong runtime/SEO.
 
 ### Luu y quan trong
-
-Frontend da duoc tra ve che do build nghiem tuc hon:
-
-- khong con `eslint.ignoreDuringBuilds`
-- khong con `typescript.ignoreBuildErrors`
-
-Hien tai da co bang chung `frontend build`, `backend build` va `frontend SEO test` chay duoc. Van con nhom warning va hardening task can don tiep neu muon public production an toan hon.
-
 ## 3. Danh gia hien trang
-
-### UX/UI va bo cuc
-
-Danh gia tong quan: kha tot, nhung chua dong nhat hoan toan.
-
-Diem on:
-
-- Co cau truc trang ro: hero, gia tri, showcase, quy trinh, FAQ, CTA.
-- Co nhieu section chia thong tin dung logic cho dich vu thiet ke website.
-- Co portfolio, testimonial, bang gia, FAQ, contact nen phu hop hanh vi khach hang tim dich vu.
-
-Diem chua on:
-
-- Da co them brand token va mot block CTA/trust dung chung, nhung van con mot so section public dung mau hardcode / tone teal cu.
-- Motion va gradient da bot roi rac hon, nhung van chua duoc chuan hoa toan bo tren moi trang.
-- Chua refactor het nhom component cu sang design token moi, nen tinh dong nhat thuong hieu moi o muc "mot phan".
 
 ### Than thien nguoi dung va de su dung
 
-Danh gia tong quan: than thien, nhung can toi uu them cho hanh trinh chuyen doi.
-
-Diem on:
-
-- CTA xuat hien ro.
-- Danh sach dich vu va du an de hieu.
-- Trang du an co bo loc, phu hop nguoi dung muon xem theo nhom.
-- Loading skeleton moi giup cam giac load tot hon va giam "nhay layout".
 
 Diem can cai thien:
 
@@ -92,12 +27,6 @@ Diem can cai thien:
 ### Responsive
 
 Danh gia tong quan: da co nen tang responsive, nhung chua nen xem la da test day du moi thiet bi.
-
-Diem on:
-
-- Phan lon section da co class `sm/md/lg`.
-- Da tach mot so asset 3D mobile/desktop.
-- Menu mobile rieng da ton tai.
 
 Rui ro con lai:
 
@@ -113,22 +42,10 @@ Ket luan:
 ### Mau sac va thuong hieu
 
 Danh gia tong quan: huong di dung, can chuan hoa them.
-
-- Mau chu dao xanh duong `#1a63a8` va xanh nhat `#80d8f9` phu hop linh vuc cong nghe, dich vu website, tao cam giac tin cay.
 - Dot nay da dua palette nay vao token trung tam.
 - Van can buoc tiep theo: refactor cac gia tri mau hardcode rai rac thanh design tokens de tranh lech tone.
 
 ### SEO
-
-Danh gia tong quan: co nen tang kha tot, nhung chua toi uu hoan tat.
-
-Diem on:
-
-- Co metadata theo trang.
-- Co canonical, Open Graph, Twitter card.
-- Co `robots.ts`, `sitemap.ts`.
-- Co FAQ schema va LocalBusiness schema.
-- Build sitemap da duoc sua de khong bi fail khi portfolio lon.
 
 Diem thieu:
 
@@ -138,19 +55,6 @@ Diem thieu:
 - Frontend khong con bo qua type-check/lint trong build, nhung van con warning can xu ly de chat luong SEO/runtime sach hon.
 
 ### Bao mat va kha nang chong tan cong
-
-Danh gia tong quan: co nen tang co ban, chua du de ket luan "an toan cao" neu public traffic lon.
-
-Diem on:
-
-- Backend co `helmet`, `compression`, validation pipe, whitelist, forbidNonWhitelisted.
-- Backend co throttling toan cuc va strict rate limit cho auth/contact.
-- Co JWT auth, role guard, permission guard.
-- Refresh token duoc hash trong database.
-- Dot nay da bo sung:
-  - security headers o frontend
-  - file upload allowlist va file-size limit
-
 Rui ro chua xu ly xong:
 
 - Luong auth admin da duoc doi sang cookie-based session flow trong code, nhung can verify them e2e toan bo CRUD admin sau khi restart app.

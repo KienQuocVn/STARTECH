@@ -33,6 +33,16 @@ export type SitePageVersion = {
   createdAt: string
 }
 
+export type SiteContentAuditLog = {
+  id: number
+  entityType: string
+  entityId?: string | null
+  action: string
+  actorId?: string | null
+  metadata?: Record<string, unknown> | null
+  createdAt: string
+}
+
 export type SitePageContent = {
   id: number
   slug: string
@@ -143,4 +153,12 @@ export async function requestChangesAdminSitePage(id: number, notes?: string) {
 
 export async function publishAdminSitePage(id: number, notes?: string) {
   return postWorkflowAction(id, 'publish', notes)
+}
+
+export async function getAdminSiteContentAuditLogs(pageId?: number) {
+  const path = pageId ? `/site-content/page/${pageId}/audit-log` : '/site-content/audit-log'
+
+  return apiClient.get<{ success: boolean; data: SiteContentAuditLog[] }>(path, {
+    headers: getAdminAuthHeaders(),
+  })
 }

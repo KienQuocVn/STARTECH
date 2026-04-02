@@ -1,3 +1,4 @@
+import { SafeInlineScript } from '@/components/safe-inline-code'
 import { serializeJsonForScript } from '@/lib/security'
 
 type SchemaScriptProps = {
@@ -5,5 +6,5 @@ type SchemaScriptProps = {
 };
 
 export function SchemaScript({ data }: SchemaScriptProps) {
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonForScript(data) }} />;
+  return <SafeInlineScript code={serializeJsonForScript(data)} />
 }

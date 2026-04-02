@@ -12,15 +12,10 @@ import { Label } from '@/components/ui/label';
 import { loginAdmin } from '@/lib/services/auth';
 import { cn } from '@/lib/utils';
 
-const defaultCredentials = {
-  email: 'admin@startech.local',
-  password: 'Startech@2026',
-};
-
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const router = useRouter();
-  const [email, setEmail] = useState(defaultCredentials.email);
-  const [password, setPassword] = useState(defaultCredentials.password);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -103,21 +98,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               {isSubmitting ? 'Dang kiem tra tai khoan...' : 'Dang nhap dashboard'}
             </Button>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              <div className="mb-2 flex items-center gap-2 font-medium text-slate-900">
-                <LockKeyhole className="h-4 w-4" />
-                Tài khoản seed mặc định
-              </div>
-              <p>
-                Email: <span className="font-mono text-slate-900">kieukienquocbussiness@gmail.com</span>
-              </p>
-              <p>
-                Mat khau: <span className="font-mono text-slate-900">Startech@2026</span>
-              </p>
-              <p className="mt-2 text-xs text-slate-500">
-                Phiên đăng nhập admin hiện được lưu bằng cookie an toàn hơn thay vì `localStorage`.
-              </p>
-            </div>
+
           </form>
 
           <div className="relative overflow-hidden bg-[radial-gradient(circle_at_top,_#fef3c7,_#fff7ed_35%,_#e2e8f0_100%)] p-7 md:p-10">

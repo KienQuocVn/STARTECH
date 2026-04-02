@@ -1,4 +1,5 @@
 import type { SitePageContent, SitePageSection } from '@/lib/services/site-content'
+import { sanitizePlainText } from '@/lib/sanitize'
 
 type AboutHeroContent = {
   imageUrl: string
@@ -61,6 +62,10 @@ function readContentJson<T>(section?: SitePageSection | null) {
   return section.contentJson as T
 }
 
+function sanitizeItems(items: string[] = []) {
+  return items.map((item) => sanitizePlainText(item)).filter(Boolean)
+}
+
 export function resolveAboutPageData(page: SitePageContent | null | undefined) {
   const heroSection = findSection(page, 'about-hero')
   const introSection = findSection(page, 'about-intro')
@@ -83,43 +88,47 @@ export function resolveAboutPageData(page: SitePageContent | null | undefined) {
   return {
     hero: {
       imageUrl: heroSection?.imageUrl || '/img/thiet-ke-web-site-tai-vinh-phuc-2.png',
-      title: heroSection?.title || page?.heroTitle || '',
-      description: heroSection?.description || page?.heroDescription || '',
+      title: sanitizePlainText(heroSection?.title || page?.heroTitle || ''),
+      description: sanitizePlainText(heroSection?.description || page?.heroDescription || ''),
     } satisfies AboutHeroContent,
     intro: {
       imageUrl: introSection?.imageUrl || '/img/dich-vu-thiet-ke-website-xay-dung.png',
-      title: introSection?.title || '',
-      description: introSection?.description || '',
+      title: sanitizePlainText(introSection?.title || ''),
+      description: sanitizePlainText(introSection?.description || ''),
     } satisfies AboutIntroContent,
     services: {
-      eyebrow: servicesSection?.subtitle || '',
-      title: servicesSection?.title || '',
+      eyebrow: sanitizePlainText(servicesSection?.subtitle || ''),
+      title: sanitizePlainText(servicesSection?.title || ''),
       imageUrl: servicesSection?.imageUrl || '/img/dich-vu-thiet-ke-website-xay-dung.png',
-      buttonLabel: servicesSection?.primaryButtonLabel || 'Xem tất cả dịch vụ',
+      buttonLabel: sanitizePlainText(servicesSection?.primaryButtonLabel || 'Xem tat ca dich vu'),
       buttonHref: servicesSection?.primaryButtonHref || '/dich-vu',
-      items: servicesJson?.items ?? [],
+      items: sanitizeItems(servicesJson?.items),
     } satisfies AboutServicesContent,
     highlights: {
-      title: highlightsSection?.title || '',
+      title: sanitizePlainText(highlightsSection?.title || ''),
       imageUrl: highlightsSection?.imageUrl || '/img/professional-web-design-team.jpg',
-      buttonLabel: highlightsSection?.primaryButtonLabel || 'Tìm hiểu thêm',
-      items: highlightsJson?.items ?? [],
+      buttonLabel: sanitizePlainText(highlightsSection?.primaryButtonLabel || 'Tim hieu them'),
+      items: sanitizeItems(highlightsJson?.items),
     } satisfies AboutHighlightsContent,
     values: {
-      heading: valuesSection?.title || '',
-      description: valuesSection?.description || '',
-      values: valuesJson?.values ?? [],
-      videoTitle: valuesSection?.subtitle || '',
-      videoDescription: valuesJson?.videoDescription || '',
+      heading: sanitizePlainText(valuesSection?.title || ''),
+      description: sanitizePlainText(valuesSection?.description || ''),
+      values: (valuesJson?.values ?? []).map((item) => ({
+        number: sanitizePlainText(item.number),
+        title: sanitizePlainText(item.title),
+        description: sanitizePlainText(item.description),
+      })),
+      videoTitle: sanitizePlainText(valuesSection?.subtitle || ''),
+      videoDescription: sanitizePlainText(valuesJson?.videoDescription || ''),
       videoImageUrl: valuesSection?.imageUrl || '/img/dich-vu-thiet-ke-website-xay-dung.png',
-      trophyTitle: valuesSection?.primaryButtonLabel || '',
-      trophyDescription: valuesJson?.trophyDescription || '',
+      trophyTitle: sanitizePlainText(valuesSection?.primaryButtonLabel || ''),
+      trophyDescription: sanitizePlainText(valuesJson?.trophyDescription || ''),
       trophyImageUrl: valuesSection?.secondaryButtonHref || '/img/dich-vu-thiet-ke-website-xay-dung.png',
-      diversityTitle: page?.heroBadge || '',
+      diversityTitle: sanitizePlainText(page?.heroBadge || ''),
       diversityBackgroundUrl: '/img/dich-vu-thiet-ke-website-xay-dung.png',
-      diversityItems: valuesJson?.diversityItems ?? [],
-      ctaDescription: valuesJson?.ctaDescription || '',
-      ctaLabel: valuesJson?.ctaLabel || 'Liên hệ ngay',
+      diversityItems: sanitizeItems(valuesJson?.diversityItems),
+      ctaDescription: sanitizePlainText(valuesJson?.ctaDescription || ''),
+      ctaLabel: sanitizePlainText(valuesJson?.ctaLabel || 'Lien he ngay'),
       ctaHref: valuesJson?.ctaHref || '/lien-he',
     } satisfies AboutValuesContent,
   }

@@ -3,6 +3,7 @@
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
 
+import { SafeInlineStyle } from '@/components/safe-inline-code'
 import { sanitizeCssIdentifier, sanitizeCssValue } from '@/lib/security'
 import { cn } from '@/lib/utils'
 
@@ -109,13 +110,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: chartCss,
-      }}
-    />
-  )
+  return <SafeInlineStyle cssText={chartCss} />
 }
 
 const ChartTooltip = RechartsPrimitive.Tooltip
