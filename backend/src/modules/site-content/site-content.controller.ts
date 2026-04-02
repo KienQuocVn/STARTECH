@@ -12,7 +12,7 @@ import {
   UpsertFaqItemDto,
   UpsertPageSectionDto,
 } from './dto/manage-site-content.dto';
-import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
+import type { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Site Content')
 @Controller('site-content')
@@ -33,6 +33,24 @@ export class SiteContentController {
   @ApiOperation({ summary: 'Lay tat ca page content cho admin' })
   findAllPages() {
     return this.siteContentService.findAllPages();
+  }
+
+  @Get('audit-log')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
+  @Permissions('content.read')
+  @ApiOperation({ summary: 'Lay lich su audit cho content workflow' })
+  findAuditLogs() {
+    return this.siteContentService.findAuditLogs();
+  }
+
+  @Get('page/:id/audit-log')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN', 'EDITOR', 'VIEWER')
+  @Permissions('content.read')
+  @ApiOperation({ summary: 'Lay lich su audit cho mot page content' })
+  findPageAuditLogs(@Param('id', ParseIntPipe) id: number) {
+    return this.siteContentService.findAuditLogs(id);
   }
 
   @Post('page')

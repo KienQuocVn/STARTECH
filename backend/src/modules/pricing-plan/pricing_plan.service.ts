@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePricingPlanDto } from './dto/create-pricing_plan.dto';
 import { ResponsePricingPlanDto } from './dto/response-pricing_plan.dto';
 import { UpdatePricingPlanDto } from './dto/update-pricing_plan.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class PricingPlanService {
@@ -53,7 +54,7 @@ export class PricingPlanService {
 
   async findAll(): Promise<ResponsePricingPlanDto> {
     try {
-      const result = await this.prisma.pricing_plan.findMany({
+      const result = await this.prisma.pricingPlan.findMany({
         orderBy: { id: 'asc' },
         include: {
           pricing_feature: {
@@ -95,10 +96,10 @@ export class PricingPlanService {
     }
   }
 
-  async create(createPricingPlanDto: CreatePricingPlanDto) {
+  async create(createPricingPlanDto: CreatePricingPlanDto, actor?: JwtPayload | null) {
     const featureIds = await this.resolveFeatureIds(createPricingPlanDto);
 
-    const plan = await this.prisma.pricing_plan.create({
+    const plan = await this.prisma.pricingPlan.create({
       data: {
         name: createPricingPlanDto.name,
         price: createPricingPlanDto.price != null ? new Prisma.Decimal(createPricingPlanDto.price) : null,
@@ -127,6 +128,7 @@ export class PricingPlanService {
       entity: 'pricing_plan',
       action: 'pricing.create',
       entityId: plan.id,
+      actor,
       metadata: {
         name: plan.name,
       },
@@ -140,11 +142,11 @@ export class PricingPlanService {
     };
   }
 
-  async update(id: number, updatePricingPlanDto: UpdatePricingPlanDto) {
+  async update(id: number, updatePricingPlanDto: UpdatePricingPlanDto, actor?: JwtPayload | null) {
     const featureIds =
       updatePricingPlanDto.featureIds || updatePricingPlanDto.featureNames ? await this.resolveFeatureIds(updatePricingPlanDto) : undefined;
 
-    const plan = await this.prisma.pricing_plan.update({
+    const plan = await this.prisma.pricingPlan.update({
       where: { id },
       data: {
         name: updatePricingPlanDto.name,
@@ -180,6 +182,7 @@ export class PricingPlanService {
       entity: 'pricing_plan',
       action: 'pricing.update',
       entityId: plan.id,
+      actor,
       metadata: {
         name: plan.name,
       },
@@ -193,8 +196,8 @@ export class PricingPlanService {
     };
   }
 
-  async remove(id: number) {
-    await this.prisma.pricing_plan.delete({
+  async remove(id: number, actor?: JwtPayload | null) {
+    await this.prisma.pricingPlan.delete({
       where: { id },
     });
 
@@ -202,6 +205,7 @@ export class PricingPlanService {
       entity: 'pricing_plan',
       action: 'pricing.delete',
       entityId: id,
+      actor,
     });
 
     return {
@@ -212,3 +216,4 @@ export class PricingPlanService {
     };
   }
 }
+

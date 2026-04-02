@@ -7,6 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { PaginationDto } from '../../shared/dto/pagination.dto';
 import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class FeedbackService {
@@ -107,7 +108,7 @@ export class FeedbackService {
     }
   }
 
-  async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
+  async update(id: number, updateFeedbackDto: UpdateFeedbackDto, actor?: JwtPayload | null) {
     const result = await this.prismaService.feedback.update({
       where: { id },
       data: updateFeedbackDto,
@@ -117,6 +118,7 @@ export class FeedbackService {
       entity: 'feedback',
       action: 'feedback.update',
       entityId: id,
+      actor,
       metadata: updateFeedbackDto as Record<string, unknown>,
     });
 
@@ -131,7 +133,7 @@ export class FeedbackService {
     };
   }
 
-  async remove(id: number) {
+  async remove(id: number, actor?: JwtPayload | null) {
     await this.prismaService.feedback.delete({
       where: { id },
     });
@@ -140,6 +142,7 @@ export class FeedbackService {
       entity: 'feedback',
       action: 'feedback.delete',
       entityId: id,
+      actor,
     });
 
     return {

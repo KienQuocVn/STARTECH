@@ -125,7 +125,7 @@ export class AuthService {
 
   async refresh(refreshTokenDto: RefreshTokenDto) {
     const payload = await this.jwtService.verifyAsync(refreshTokenDto.refreshToken, {
-      secret: process.env.JWT_SECRET || 'startech-dev-secret',
+      secret: process.env.JWT_SECRET,
     });
 
     const storedTokens = await (this.prisma as any).refreshToken.findMany({

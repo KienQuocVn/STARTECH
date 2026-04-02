@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { PricingPlanService } from './pricing_plan.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePricingPlanDto } from './dto/create-pricing_plan.dto';
@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Permissions } from '../auth/permissions.decorator';
+import type { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Pricing Plan')
 @Controller('pricing-plan')
@@ -78,8 +79,8 @@ export class PricingPlanController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('pricing.write')
   @ApiOperation({ summary: 'Tao goi gia admin' })
-  create(@Body() createPricingPlanDto: CreatePricingPlanDto) {
-    return this.pricingPlanService.create(createPricingPlanDto);
+  create(@Req() request: AuthenticatedRequest, @Body() createPricingPlanDto: CreatePricingPlanDto) {
+    return this.pricingPlanService.create(createPricingPlanDto, request.user);
   }
 
   @Patch(':id')
@@ -87,8 +88,8 @@ export class PricingPlanController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('pricing.write')
   @ApiOperation({ summary: 'Cap nhat goi gia admin' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updatePricingPlanDto: UpdatePricingPlanDto) {
-    return this.pricingPlanService.update(id, updatePricingPlanDto);
+  update(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() updatePricingPlanDto: UpdatePricingPlanDto) {
+    return this.pricingPlanService.update(id, updatePricingPlanDto, request.user);
   }
 
   @Delete(':id')
@@ -96,7 +97,7 @@ export class PricingPlanController {
   @Roles('SUPER_ADMIN')
   @Permissions('pricing.delete')
   @ApiOperation({ summary: 'Xoa goi gia admin' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.pricingPlanService.remove(id);
+  remove(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.pricingPlanService.remove(id, request.user);
   }
 }

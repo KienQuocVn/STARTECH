@@ -12,23 +12,26 @@ datasource db {
 }
 
 // ========== Model: Danh mục sản phẩm ==========
-model category {
+model Category {
   id               Int                @id @default(autoincrement())
   name             String             @db.VarChar(191)
-  product_category product_cat[]
+  product_category ProductCategory[]
 
   @@index([id])
+  @@map("category")
 }
 
 // ========== Model: Dịch vụ ==========
-model services {
+model Service {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(191)
-  product_service product_service[]
+  product_service ProductService[]
+
+  @@map("services")
 }
 
 // ========== Model: Sản phẩm ==========
-model product {
+model Product {
   id               Int                @id @default(autoincrement())
   slug             String?            @unique(map: "product_slug_unique") @db.VarChar(191)
   name             String             @db.VarChar(191)
@@ -43,94 +46,105 @@ model product {
   createdAt       DateTime           @default(now()) @db.DateTime(0)
   updatedAt       DateTime           @updatedAt @db.DateTime(0)
 
-  product_category product_cat[]
-  product_service  product_service[]
-  images           images[]
+  product_category ProductCategory[]
+  product_service  ProductService[]
+  images           ProductImage[]
 
   @@index([name], map: "product_name_idx")
   @@index([slug], map: "product_slug_idx")
   @@fulltext([name, description], map: "product_fulltext_idx")
+  @@map("product")
 }
 
 // ========== Model: Bảng trung gian Product - Category ==========
-model product_cat {
+model ProductCategory {
   id          Int         @id @default(autoincrement())
   product_id  Int
   category_id Int
 
-  product  product     @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category category  @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product  Product     @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category Category  @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([product_id, category_id], map: "unique_product_category")
   @@index([product_id], map: "product_category_product_idx")
   @@index([category_id], map: "product_category_category_idx")
+  @@map("product_cat")
 }
 
 // ========== Model: Ảnh phụ ==========
-model images {
+model ProductImage {
   id         Int     @id @default(autoincrement())
   product_id Int
   url        String  @db.VarChar(255)
 
-  product product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([product_id], map: "images_product_idx")
+  @@map("images")
 }
 
 // ========== Model: Bảng trung gian Product - Service ==========
-model product_service {
+model ProductService {
   id         Int      @id @default(autoincrement())
   product_id Int
   service_id Int
 
-  product product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  service services @relation(fields: [service_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product Product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  service Service @relation(fields: [service_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([product_id], map: "product_service_product_idx")
   @@index([service_id], map: "product_service_service_idx")
+  @@map("product_service")
 }
 
 // ========== Model: Phản hồi khách hàng ==========
-model feedback {
+model Feedback {
   id         Int      @id @default(autoincrement())
   name       String   @db.VarChar(191)
   comment    String   @db.Text
   rating     Decimal  @db.Decimal(2, 1)
   createdAt DateTime @default(now()) @db.DateTime(0)
+
+  @@map("feedback")
 }
 
 // ========== Model: Tính năng ==========
-model feature {
+model Feature {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(191)
   description     String?           @db.Text
-  pricing_feature pricing_feature[]
+  pricing_feature PricingFeature[]
+
+  @@map("feature")
 }
 
 // ========== Model: Gói dịch vụ ==========
-model pricing_plan {
+model PricingPlan {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(191)
   price           Decimal?          @db.Decimal(10, 2) 
   price_Type      PriceType
   description     String?           @db.Text
-  pricing_feature pricing_feature[]
+  pricing_feature PricingFeature[]
+
+  @@map("pricing_plan")
 }
 
 // ========== Model: Bảng trung gian Pricing - Feature ==========
-model pricing_feature {
+model PricingFeature {
   id              Int          @id @default(autoincrement())
   pricing_plan_id Int
   feature_id      Int
 
-  pricing_plan pricing_plan @relation(fields: [pricing_plan_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  feature      feature      @relation(fields: [feature_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pricing_plan PricingPlan @relation(fields: [pricing_plan_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  feature      Feature      @relation(fields: [feature_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([pricing_plan_id], map: "pricing_feature_plan_idx")
   @@index([feature_id], map: "pricing_feature_feature_idx")
+  @@map("pricing_feature")
 }
 
-model showcase_item {
+model ShowcaseItem {
   id            Int      @id @default(autoincrement())
   image_url     String   @db.VarChar(255)
   name          String   @db.VarChar(255)
@@ -141,9 +155,10 @@ model showcase_item {
   updatedAt     DateTime @updatedAt @db.DateTime(0)
 
   @@index([display_order], map: "showcase_item_display_order_idx")
+  @@map("showcase_item")
 }
 
-model contact_submission {
+model ContactSubmission {
   id         Int                     @id @default(autoincrement())
   name       String                  @db.VarChar(191)
   email      String                  @db.VarChar(191)
@@ -157,6 +172,7 @@ model contact_submission {
 
   @@index([email], map: "contact_submission_email_idx")
   @@index([status], map: "contact_submission_status_idx")
+  @@map("contact_submission")
 }
 
 enum PriceType {
@@ -355,3 +371,4 @@ model ContentAuditLog {
   @@index([action], map: "content_audit_action_idx")
   @@map("content_audit_log")
 }
+

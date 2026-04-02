@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
+import type { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
 
 @ApiTags('Auth')
 @Controller('auth')

@@ -8,7 +8,17 @@ describe('FeedbackController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FeedbackController],
-      providers: [FeedbackService],
+      providers: [
+        {
+          provide: FeedbackService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<FeedbackController>(FeedbackController);

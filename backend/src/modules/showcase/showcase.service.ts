@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { CreateShowcaseDto } from './dto/create-showcase.dto';
 import { UpdateShowcaseDto } from './dto/update-showcase.dto';
 import { BusinessEventsService } from '../../shared/business-events/business-events.service';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class ShowcaseService {
@@ -14,7 +15,7 @@ export class ShowcaseService {
 
   async findAll() {
     try {
-      const items = await this.prisma.showcase_item.findMany({
+      const items = await this.prisma.showcaseItem.findMany({
         orderBy: [{ display_order: 'asc' }, { id: 'asc' }],
       });
 
@@ -34,8 +35,8 @@ export class ShowcaseService {
     }
   }
 
-  async create(createShowcaseDto: CreateShowcaseDto) {
-    const item = await this.prisma.showcase_item.create({
+  async create(createShowcaseDto: CreateShowcaseDto, actor?: JwtPayload | null) {
+    const item = await this.prisma.showcaseItem.create({
       data: {
         ...createShowcaseDto,
         website_url: createShowcaseDto.website_url || null,
@@ -47,6 +48,7 @@ export class ShowcaseService {
       entity: 'showcase_item',
       action: 'showcase.create',
       entityId: item.id,
+      actor,
       metadata: {
         name: item.name,
       },
@@ -60,8 +62,8 @@ export class ShowcaseService {
     };
   }
 
-  async update(id: number, updateShowcaseDto: UpdateShowcaseDto) {
-    const item = await this.prisma.showcase_item.update({
+  async update(id: number, updateShowcaseDto: UpdateShowcaseDto, actor?: JwtPayload | null) {
+    const item = await this.prisma.showcaseItem.update({
       where: { id },
       data: updateShowcaseDto,
     });
@@ -70,6 +72,7 @@ export class ShowcaseService {
       entity: 'showcase_item',
       action: 'showcase.update',
       entityId: item.id,
+      actor,
       metadata: updateShowcaseDto as Record<string, unknown>,
     });
 
@@ -81,8 +84,8 @@ export class ShowcaseService {
     };
   }
 
-  async remove(id: number) {
-    await this.prisma.showcase_item.delete({
+  async remove(id: number, actor?: JwtPayload | null) {
+    await this.prisma.showcaseItem.delete({
       where: { id },
     });
 
@@ -90,6 +93,7 @@ export class ShowcaseService {
       entity: 'showcase_item',
       action: 'showcase.delete',
       entityId: id,
+      actor,
     });
 
     return {
@@ -100,3 +104,4 @@ export class ShowcaseService {
     };
   }
 }
+

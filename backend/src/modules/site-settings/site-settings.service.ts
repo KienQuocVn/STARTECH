@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { BusinessEventsService } from '../../shared/business-events/business-events.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateSiteSettingsDto } from './dto/update-site-settings.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 type SiteSettingsValue = string | number | boolean | Record<string, unknown> | null;
 
@@ -87,7 +88,7 @@ export class SiteSettingsService {
     };
   }
 
-  async update(dto: UpdateSiteSettingsDto) {
+  async update(dto: UpdateSiteSettingsDto, actor?: JwtPayload | null) {
     const entries = Object.entries(dto.settings ?? {});
 
     await this.prisma.$transaction(
@@ -110,6 +111,7 @@ export class SiteSettingsService {
     this.businessEvents.log({
       entity: 'site_setting',
       action: 'settings.bulk.update',
+      actor,
       metadata: {
         keys: entries.map(([settingKey]) => settingKey),
       },

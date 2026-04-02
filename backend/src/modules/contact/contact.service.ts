@@ -7,6 +7,7 @@ import { BusinessEventsService } from '../../shared/business-events/business-eve
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
 import { StatusCodes } from 'http-status-codes';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class ContactService {
@@ -21,7 +22,7 @@ export class ContactService {
 
   async submitForm(data: CreateContactDto) {
     try {
-      const contact = await this.prisma.contact_submission.create({
+      const contact = await this.prisma.contactSubmission.create({
         data: {
           name: data.name,
           email: data.email,
@@ -82,7 +83,7 @@ export class ContactService {
   }
 
   async findAll() {
-    const items = await this.prisma.contact_submission.findMany({
+    const items = await this.prisma.contactSubmission.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
@@ -94,8 +95,8 @@ export class ContactService {
     };
   }
 
-  async updateStatus(id: number, updateContactStatusDto: UpdateContactStatusDto) {
-    const contact = await this.prisma.contact_submission.update({
+  async updateStatus(id: number, updateContactStatusDto: UpdateContactStatusDto, actor?: JwtPayload | null) {
+    const contact = await this.prisma.contactSubmission.update({
       where: { id },
       data: { status: updateContactStatusDto.status },
     });
@@ -104,6 +105,7 @@ export class ContactService {
       entity: 'contact_submission',
       action: 'contact.status.update',
       entityId: id,
+      actor,
       metadata: {
         status: updateContactStatusDto.status,
       },
@@ -117,8 +119,8 @@ export class ContactService {
     };
   }
 
-  async remove(id: number) {
-    await this.prisma.contact_submission.delete({
+  async remove(id: number, actor?: JwtPayload | null) {
+    await this.prisma.contactSubmission.delete({
       where: { id },
     });
 
@@ -126,6 +128,7 @@ export class ContactService {
       entity: 'contact_submission',
       action: 'contact.delete',
       entityId: id,
+      actor,
     });
 
     return {
@@ -136,3 +139,4 @@ export class ContactService {
     };
   }
 }
+

@@ -5,6 +5,16 @@ import type { Request } from 'express';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { resolvePermissionsForRole } from './permissions';
 
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error('JWT_SECRET must be defined before initializing JwtStrategy.');
+  }
+
+  return secret;
+}
+
 function extractTokenFromCookie(request: Request) {
   const rawCookie = request.headers.cookie;
   if (!rawCookie) return null;
@@ -26,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken(), extractTokenFromCookie]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'startech-dev-secret',
+      secretOrKey: getJwtSecret(),
     });
   }
 

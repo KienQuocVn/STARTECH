@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { ResponseServiceDto } from './dto/response-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class ServicesService {
@@ -16,7 +17,7 @@ export class ServicesService {
 
   async findAll(): Promise<ResponseServiceDto> {
     try {
-      const result = await this.prisma.services.findMany({
+      const result = await this.prisma.service.findMany({
         orderBy: { id: 'asc' },
         select: { id: true, name: true },
       });
@@ -43,8 +44,8 @@ export class ServicesService {
     }
   }
 
-  async create(createServiceDto: CreateServiceDto) {
-    const service = await this.prisma.services.create({
+  async create(createServiceDto: CreateServiceDto, actor?: JwtPayload | null) {
+    const service = await this.prisma.service.create({
       data: {
         name: createServiceDto.name,
       },
@@ -54,6 +55,7 @@ export class ServicesService {
       entity: 'services',
       action: 'service.create',
       entityId: service.id,
+      actor,
       metadata: {
         name: service.name,
       },
@@ -67,8 +69,8 @@ export class ServicesService {
     };
   }
 
-  async update(id: number, updateServiceDto: UpdateServiceDto) {
-    const service = await this.prisma.services.update({
+  async update(id: number, updateServiceDto: UpdateServiceDto, actor?: JwtPayload | null) {
+    const service = await this.prisma.service.update({
       where: { id },
       data: updateServiceDto,
     });
@@ -77,6 +79,7 @@ export class ServicesService {
       entity: 'services',
       action: 'service.update',
       entityId: service.id,
+      actor,
       metadata: updateServiceDto as Record<string, unknown>,
     });
 
@@ -88,8 +91,8 @@ export class ServicesService {
     };
   }
 
-  async remove(id: number) {
-    await this.prisma.services.delete({
+  async remove(id: number, actor?: JwtPayload | null) {
+    await this.prisma.service.delete({
       where: { id },
     });
 
@@ -97,6 +100,7 @@ export class ServicesService {
       entity: 'services',
       action: 'service.delete',
       entityId: id,
+      actor,
     });
 
     return {
@@ -107,3 +111,4 @@ export class ServicesService {
     };
   }
 }
+

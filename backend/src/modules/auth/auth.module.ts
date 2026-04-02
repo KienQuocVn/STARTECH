@@ -12,7 +12,7 @@ import { RolesGuard } from './roles.guard';
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'startech-dev-secret',
+      secret: process.env.JWT_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRES_IN || '12h',
       },

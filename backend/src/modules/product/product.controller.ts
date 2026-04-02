@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from '../../shared/dto/pagination.dto';
 import { ProductService } from './product.service';
@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Permissions } from '../auth/permissions.decorator';
+import type { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Product')
 @Controller('product')
@@ -69,8 +70,8 @@ export class ProductController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('product.write')
   @ApiOperation({ summary: 'Tao san pham admin' })
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  create(@Req() request: AuthenticatedRequest, @Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto, request.user);
   }
 
   @Patch(':id')
@@ -78,8 +79,8 @@ export class ProductController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('product.write')
   @ApiOperation({ summary: 'Cap nhat san pham admin' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(id, updateProductDto);
+  update(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
+    return this.productService.update(id, updateProductDto, request.user);
   }
 
   @Delete(':id')
@@ -87,7 +88,7 @@ export class ProductController {
   @Roles('SUPER_ADMIN')
   @Permissions('product.delete')
   @ApiOperation({ summary: 'Xoa san pham admin' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productService.remove(id);
+  remove(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.productService.remove(id, request.user);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Permissions } from '../auth/permissions.decorator';
+import type { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Feedback')
 @Controller('feedback')
@@ -93,8 +94,8 @@ export class FeedbackController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('feedback.write')
   @ApiOperation({ summary: 'Cap nhat phan hoi admin' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateFeedbackDto: UpdateFeedbackDto) {
-    return this.feedbackService.update(id, updateFeedbackDto);
+  update(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() updateFeedbackDto: UpdateFeedbackDto) {
+    return this.feedbackService.update(id, updateFeedbackDto, request.user);
   }
 
   @Delete(':id')
@@ -102,7 +103,7 @@ export class FeedbackController {
   @Roles('SUPER_ADMIN')
   @Permissions('feedback.delete')
   @ApiOperation({ summary: 'Xoa phan hoi admin' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.feedbackService.remove(id);
+  remove(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.feedbackService.remove(id, request.user);
   }
 }

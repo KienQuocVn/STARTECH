@@ -1,8 +1,8 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ContactStatus } from '../../global/globalEnum';
 import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
-import { ContactStatus } from '../../global/globalEnum';
-import { InternalServerErrorException } from '@nestjs/common';
 
 describe('ContactController', () => {
   let controller: ContactController;
@@ -16,6 +16,9 @@ describe('ContactController', () => {
           provide: ContactService,
           useValue: {
             submitForm: jest.fn(),
+            findAll: jest.fn(),
+            updateStatus: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
@@ -29,21 +32,25 @@ describe('ContactController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('submitForm', () => {
+  describe('create', () => {
     const createDto = {
-      name: 'Nguyễn Văn A',
-      company: 'Công ty ABC',
+      name: 'Nguyen Van A',
+      company: 'Cong ty ABC',
       email: 'nguyenvana@example.com',
       phone: '0123456789',
       service: 'Web Development',
       message: 'Hello, this is a test message.',
     };
 
-    it('should return success when service succeeds', async () => {
+    it('returns success payload when service succeeds', async () => {
       const mockResult = {
         success: true,
-        message: 'Liên hệ thành công!',
+        message: 'Lien he thanh cong!',
         status: ContactStatus.WAITING,
+        data: {
+          id: 1,
+          createdAt: new Date('2026-04-02T00:00:00.000Z'),
+        },
       };
 
       service.submitForm.mockResolvedValue(mockResult);
@@ -54,16 +61,16 @@ describe('ContactController', () => {
       expect(service.submitForm).toHaveBeenCalledWith(createDto);
     });
 
-    it('should return failure when service fails', async () => {
+    it('rethrows service errors', async () => {
       const internalError = new InternalServerErrorException({
         success: false,
-        message: 'Có lỗi xảy ra. Vui lòng thử lại sau.',
+        message: 'Co loi xay ra. Vui long thu lai sau.',
         details: 'Google sheet error',
       });
 
-      (service.submitForm as jest.Mock).mockRejectedValue(internalError);
+      service.submitForm.mockRejectedValue(internalError);
 
-      await expect(controller.create(createDto)).rejects.toThrow('Có lỗi xảy ra. Vui lòng thử lại sau.');
+      await expect(controller.create(createDto)).rejects.toThrow('Co loi xay ra. Vui long thu lai sau.');
     });
   });
 });

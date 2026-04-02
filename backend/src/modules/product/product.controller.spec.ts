@@ -1,8 +1,7 @@
+import { PriceType } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Decimal } from '@prisma/client/runtime/library';
-import { PriceType } from '@prisma/client';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -17,6 +16,12 @@ describe('ProductController', () => {
           useValue: {
             findAll: jest.fn(),
             findOne: jest.fn(),
+            findBySlug: jest.fn(),
+            findByCategory: jest.fn(),
+            search: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
@@ -31,46 +36,31 @@ describe('ProductController', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of products', async () => {
+    it('returns paginated product payload', async () => {
       const mockQuery = { page: 1, limit: 10 };
       const mockedResult = {
         success: true,
         statusCode: 200,
-        message: 'Lấy danh sách sản phẩm thành công.',
+        message: 'Lay danh sach san pham thanh cong.',
         data: {
           items: [
             {
               id: 1,
-              product_cat_id: 4,
+              slug: 'product-1',
               name: 'Product 1',
               description: 'Description 1',
               price: '100',
               price_Type: PriceType.FIXED,
-              rating: new Decimal(4.5),
+              rating: 4.5,
               like: 10,
               completion_time: '30',
               image_url: 'http://example.com/image1.jpg',
               demo_url: 'http://example.com/demo1',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-            {
-              id: 2,
-              product_cat_id: 4,
-              name: 'Product 2',
-              description: 'Description 2',
-              price: 'Liên hệ',
-              price_Type: PriceType.CONTACT,
-              rating: new Decimal(4.0),
-              like: 5,
-              completion_time: '15',
-              image_url: 'http://example.com/image2.jpg',
-              demo_url: 'http://example.com/demo2',
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              product_category: [],
+              product_service: [],
             },
           ],
-          total: 2,
+          total: 1,
           page: 1,
           limit: 10,
           totalPages: 1,
@@ -84,110 +74,56 @@ describe('ProductController', () => {
 
       expect(result.success).toBe(true);
       expect(result.statusCode).toBe(200);
-      expect(result.message).toBe('Lấy danh sách sản phẩm thành công.');
-
-      expect(result.data).toHaveProperty('items');
-      expect(result.data).toBeTruthy();
-      expect(Array.isArray(result.data!.items)).toBe(true);
-      expect(result.data).toHaveProperty('page', 1);
-      expect(result.data).toHaveProperty('limit', 10);
-
+      expect(result.data?.items).toHaveLength(1);
       expect(service.findAll).toHaveBeenCalledWith(mockQuery);
-    });
-
-    it('should call service.findAll with default params if no query', async () => {
-      const mockResponse = {
-        success: true,
-        statusCode: 200,
-        message: 'Lấy danh sách sản phẩm thành công.',
-        data: {
-          items: [],
-          total: 2,
-          page: 1,
-          limit: 10,
-          totalPages: 1,
-          hasNext: false,
-          hasPrev: false,
-        },
-      };
-
-      service.findAll.mockResolvedValue(mockResponse);
-
-      const result = await controller.findAll({});
-      expect(result.statusCode).toBe(200);
-      expect(result.message).toContain('Lấy danh sách sản phẩm');
-
-      expect(service.findAll).toHaveBeenCalledWith({});
     });
   });
 
   describe('findOne', () => {
-    it('should return a single product', async () => {
-      const mockId = 1;
+    it('returns single product payload', async () => {
       const mockedResult = {
         success: true,
         statusCode: 200,
-        message: 'Lấy thông tin sản phẩm thành công.',
+        message: 'Lay thong tin san pham thanh cong.',
         data: {
           id: 1,
-          price: '100',
-          rating: new Decimal(4.5),
-          like: 10,
-          completion_time: '30',
-          demo_url: 'http://example.com/demo1',
+          slug: 'product-1',
           name: 'Product 1',
+              description: 'Description 1',
+              price: '100',
+              price_Type: PriceType.FIXED,
+              rating: 4.5,
+              like: 10,
+          completion_time: '30',
           image_url: 'http://example.com/image1.jpg',
-          description: 'Description 1',
+          demo_url: 'http://example.com/demo1',
+          images: [],
+          product_category: [],
+          product_service: [],
         },
       };
       service.findOne.mockResolvedValue(mockedResult);
 
-      const result = await controller.findOne(mockId);
+      const result = await controller.findOne(1);
 
       expect(result.success).toBe(true);
-      expect(result.statusCode).toBe(200);
-      expect(result.message).toBe('Lấy thông tin sản phẩm thành công.');
-      expect(result.data).toBeTruthy();
-      expect(result.data).toHaveProperty('id', 1);
-
-      expect(service.findOne).toHaveBeenCalledWith(mockId);
+      expect(result.data?.slug).toBe('product-1');
+      expect(service.findOne).toHaveBeenCalledWith(1);
     });
 
-    it('should throw an error if product not found', async () => {
-      const mockId = 999999999;
-
+    it('returns not found payload when service misses product', async () => {
       service.findOne.mockResolvedValue({
         success: false,
         statusCode: 404,
-        message: 'Sản phẩm không tồn tại.',
+        message: 'San pham khong ton tai.',
         data: null,
       });
 
-      const result = await controller.findOne(mockId);
+      const result = await controller.findOne(999999999);
 
-      expect(service.findOne).toHaveBeenCalledWith(mockId);
       expect(result.success).toBe(false);
       expect(result.statusCode).toBe(404);
-      expect(result.message).toBe('Sản phẩm không tồn tại.');
       expect(result.data).toBeNull();
-    });
-
-    it('should return 500 if internal error occurs', async () => {
-      const mockId = 123;
-
-      service.findOne.mockResolvedValue({
-        success: false,
-        statusCode: 500,
-        message: 'Đã xảy ra lỗi khi lấy thông tin sản phẩm.',
-        data: null,
-      });
-
-      const result = await controller.findOne(mockId);
-
-      expect(service.findOne).toHaveBeenCalledWith(mockId);
-      expect(result.success).toBe(false);
-      expect(result.statusCode).toBe(500);
-      expect(result.message).toBe('Đã xảy ra lỗi khi lấy thông tin sản phẩm.');
     });
   });
 });

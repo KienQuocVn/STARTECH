@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDetailResponse, ProductResponse } from './dto/response-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class ProductService {
@@ -275,7 +276,7 @@ export class ProductService {
     }
   }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, actor?: JwtPayload | null) {
     const product = await this.prisma.product.create({
       data: {
         slug: createProductDto.slug || this.buildSlug(createProductDto.name),
@@ -319,6 +320,7 @@ export class ProductService {
       entity: 'product',
       action: 'product.create',
       entityId: product.id,
+      actor,
       metadata: {
         slug: product.slug,
         name: product.name,
@@ -333,7 +335,7 @@ export class ProductService {
     };
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: number, updateProductDto: UpdateProductDto, actor?: JwtPayload | null) {
     const existing = await this.prisma.product.findUnique({
       where: { id },
     });
@@ -387,6 +389,7 @@ export class ProductService {
       entity: 'product',
       action: 'product.update',
       entityId: product.id,
+      actor,
       metadata: {
         slug: product.slug,
       },
@@ -400,7 +403,7 @@ export class ProductService {
     };
   }
 
-  async remove(id: number) {
+  async remove(id: number, actor?: JwtPayload | null) {
     await this.prisma.product.delete({
       where: { id },
     });
@@ -409,6 +412,7 @@ export class ProductService {
       entity: 'product',
       action: 'product.delete',
       entityId: id,
+      actor,
     });
 
     return {

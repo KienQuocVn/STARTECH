@@ -5,10 +5,15 @@ import { ResponseCategoryDto } from './dto/response-category.dto';
 import { StatusCodes } from 'http-status-codes';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { BusinessEventsService } from '../../shared/business-events/business-events.service';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly businessEvents: BusinessEventsService,
+  ) {}
 
   async findAll(): Promise<ResponseCategoryDto> {
     try {
@@ -46,10 +51,20 @@ export class CategoryService {
     }
   }
 
-  async create(createCategoryDto: CreateCategoryDto) {
+  async create(createCategoryDto: CreateCategoryDto, actor?: JwtPayload | null) {
     const category = await this.prisma.category.create({
       data: {
         name: createCategoryDto.name,
+      },
+    });
+
+    this.businessEvents.log({
+      entity: 'category',
+      action: 'category.create',
+      entityId: category.id,
+      actor,
+      metadata: {
+        name: category.name,
       },
     });
 
@@ -61,11 +76,21 @@ export class CategoryService {
     };
   }
 
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+  async update(id: number, updateCategoryDto: UpdateCategoryDto, actor?: JwtPayload | null) {
     const category = await this.prisma.category.update({
       where: { id },
       data: {
         name: updateCategoryDto.name,
+      },
+    });
+
+    this.businessEvents.log({
+      entity: 'category',
+      action: 'category.update',
+      entityId: category.id,
+      actor,
+      metadata: {
+        name: category.name,
       },
     });
 
@@ -77,9 +102,16 @@ export class CategoryService {
     };
   }
 
-  async remove(id: number) {
+  async remove(id: number, actor?: JwtPayload | null) {
     await this.prisma.category.delete({
       where: { id },
+    });
+
+    this.businessEvents.log({
+      entity: 'category',
+      action: 'category.delete',
+      entityId: id,
+      actor,
     });
 
     return {

@@ -2,6 +2,7 @@ import { PrismaClient, Prisma, PriceType, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
+const SEED_MODE = (process.env.SEED_MODE ?? 'safe').trim().toLowerCase();
 
 function toSlug(value: string) {
   return value
@@ -12,14 +13,79 @@ function toSlug(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+async function upsertAdminUser() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      'REQUIRED: Admin credentials missing for seed.\n' +
+        'Please set environment variables:\n' +
+        '  ADMIN_EMAIL=your-admin-email@example.com\n' +
+        '  ADMIN_PASSWORD=your-strong-password\n',
+    );
+  }
+
+  if (adminPassword.length < 8) {
+    throw new Error('Security: Admin password must be at least 8 characters long');
+  }
+
+  const normalizedEmail = adminEmail.toLowerCase().trim();
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+  await prisma.user.upsert({
+    where: { email: normalizedEmail },
+    update: {
+      fullName: 'STARTECH Admin',
+      passwordHash,
+      role: UserRole.SUPER_ADMIN,
+      isActive: true,
+    },
+    create: {
+      email: normalizedEmail,
+      fullName: 'STARTECH Admin',
+      passwordHash,
+      role: UserRole.SUPER_ADMIN,
+      isActive: true,
+    },
+  });
+
+  return normalizedEmail;
+}
+
 async function main() {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('Seed script bi chan trong production environment.');
+    throw new Error(
+      'DESTRUCTIVE: Seed script is blocked in production environment.This script DELETES all existing data and cannot be undone. For production database initialization, use a separate migration script instead.',
+    );
+  }
+
+  if (SEED_MODE !== 'reset') {
+    const adminEmail = await upsertAdminUser();
+
+    console.log('SAFE seed completed.');
+    console.log(`Admin account is ready: ${adminEmail}`);
+    console.log('To load the full demo dataset, run with SEED_MODE=reset and ALLOW_DESTRUCTIVE_SEED=true.');
+    return;
   }
 
   if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
-    throw new Error('Seed script yeu cau ALLOW_DESTRUCTIVE_SEED=true vi se xoa du lieu hien co.');
+    throw new Error(
+      'SAFETY: Seed script requires explicit confirmation flag.\n' +
+        'This script will DELETE ALL existing data in the database.\n' +
+        'Command: ALLOW_DESTRUCTIVE_SEED=true npm run seed\n' +
+        'Use only in development environments!\n',
+    );
   }
+
+  console.warn('');
+  console.warn('╔════════════════════════════════════════════════════════════╗');
+  console.warn('║ ⚠️  DESTRUCTIVE SEED SCRIPT - DELETING ALL DATA              ║');
+  console.warn('╚════════════════════════════════════════════════════════════╝');
+  console.warn('');
+  console.warn('⏱️  This script will delete all existing data in 3 seconds...');
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.warn('🔄 Proceeding with seed...\n');
 
   prisma.$use(async (params, next) => {
     if (params.model === 'product' && params.action === 'create') {
@@ -39,17 +105,17 @@ async function main() {
   await (prisma as any).refreshToken.deleteMany();
   await (prisma as any).mediaAsset.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.pricing_feature.deleteMany();
-  await prisma.product_service.deleteMany();
-  await prisma.images.deleteMany();
-  await prisma.product_cat.deleteMany();
-  await prisma.contact_submission.deleteMany();
+  await prisma.pricingFeature.deleteMany();
+  await prisma.productService.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.productCategory.deleteMany();
+  await prisma.contactSubmission.deleteMany();
   await prisma.feedback.deleteMany();
   await prisma.product.deleteMany();
-  await prisma.showcase_item.deleteMany();
-  await prisma.services.deleteMany();
+  await prisma.showcaseItem.deleteMany();
+  await prisma.service.deleteMany();
   await prisma.feature.deleteMany();
-  await prisma.pricing_plan.deleteMany();
+  await prisma.pricingPlan.deleteMany();
   await prisma.category.deleteMany();
 
   // 1) Seed Category
@@ -79,14 +145,14 @@ async function main() {
   // 2) Seed Services
   console.log('🛠️ Tạo dịch vụ...');
   const serviceRecords = await Promise.all([
-    prisma.services.create({ data: { name: 'THIẾT KẾ WEBSITE' } }),
-    prisma.services.create({ data: { name: 'THIẾT KẾ SÀN THƯƠNG MẠI ĐIỆN TỬ' } }),
-    prisma.services.create({ data: { name: 'THIẾT KẾ WEB APP' } }),
-    prisma.services.create({ data: { name: 'DỊCH VỤ SEO' } }),
-    prisma.services.create({ data: { name: 'QUẢN TRỊ WEBSITE' } }),
-    prisma.services.create({ data: { name: 'HOSTING' } }),
-    prisma.services.create({ data: { name: 'DOMAIN' } }),
-    prisma.services.create({ data: { name: 'DỊCH VỤ QUẢNG CÁO ĐA KÊNH' } }),
+    prisma.service.create({ data: { name: 'THIẾT KẾ WEBSITE' } }),
+    prisma.service.create({ data: { name: 'THIẾT KẾ SÀN THƯƠNG MẠI ĐIỆN TỬ' } }),
+    prisma.service.create({ data: { name: 'THIẾT KẾ WEB APP' } }),
+    prisma.service.create({ data: { name: 'DỊCH VỤ SEO' } }),
+    prisma.service.create({ data: { name: 'QUẢN TRỊ WEBSITE' } }),
+    prisma.service.create({ data: { name: 'HOSTING' } }),
+    prisma.service.create({ data: { name: 'DOMAIN' } }),
+    prisma.service.create({ data: { name: 'DỊCH VỤ QUẢNG CÁO ĐA KÊNH' } }),
   ]);
 
   // 3) Seed Products (CONTACT => price null)
@@ -108,7 +174,7 @@ async function main() {
     },
   });
   products.push(product1);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product1.id, category_id: category[1].id }, // Bán hàng
       { product_id: product1.id, category_id: category[9].id }, // Làm đẹp
@@ -130,7 +196,7 @@ async function main() {
     },
   });
   products.push(product2);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product2.id, category_id: category[1].id }, // Bán hàng
       { product_id: product2.id, category_id: category[15].id }, // Thời trang
@@ -151,7 +217,7 @@ async function main() {
     },
   });
   products.push(product3);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product3.id, category_id: category[1].id }, // Bán hàng
       { product_id: product3.id, category_id: category[0].id }, // Ẩm thực
@@ -173,7 +239,7 @@ async function main() {
     },
   });
   products.push(product4);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product4.id, category_id: category[1].id }, // Bán hàng
       { product_id: product4.id, category_id: category[12].id }, // Ô tô
@@ -194,7 +260,7 @@ async function main() {
     },
   });
   products.push(product5);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product5.id, category_id: category[1].id }, // Bán hàng
       { product_id: product5.id, category_id: category[3].id }, // Công nghệ
@@ -216,7 +282,7 @@ async function main() {
     },
   });
   products.push(product6);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product6.id, category_id: category[1].id }, // Bán hàng
       { product_id: product6.id, category_id: category[0].id }, // Ẩm thực
@@ -238,7 +304,7 @@ async function main() {
     },
   });
   products.push(product7);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product7.id, category_id: category[1].id }, // Bán hàng
       { product_id: product7.id, category_id: category[17].id }, // Xây dựng
@@ -260,7 +326,7 @@ async function main() {
     },
   });
   products.push(product8);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product8.id, category_id: category[1].id }, // Bán hàng
       { product_id: product8.id, category_id: category[12].id }, // Ô tô
@@ -282,7 +348,7 @@ async function main() {
     },
   });
   products.push(product9);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product9.id, category_id: category[1].id }, // Bán hàng
       { product_id: product9.id, category_id: category[11].id }, // Nội thất
@@ -303,7 +369,7 @@ async function main() {
     },
   });
   products.push(product10);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product10.id, category_id: category[1].id }, // Bán hàng
       { product_id: product10.id, category_id: category[0].id }, // Ẩm thực
@@ -325,7 +391,7 @@ async function main() {
     },
   });
   products.push(product11);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product11.id, category_id: category[1].id }, // Bán hàng
       { product_id: product11.id, category_id: category[0].id }, // Ẩm thực
@@ -346,7 +412,7 @@ async function main() {
     },
   });
   products.push(product12);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product12.id, category_id: category[1].id }, // Bán hàng
       { product_id: product12.id, category_id: category[15].id }, // Thời trang
@@ -367,7 +433,7 @@ async function main() {
     },
   });
   products.push(product13);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product13.id, category_id: category[1].id }, // Bán hàng
       { product_id: product13.id, category_id: category[3].id }, // Công nghệ
@@ -389,7 +455,7 @@ async function main() {
     },
   });
   products.push(product14);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product14.id, category_id: category[1].id }, // Bán hàng
       { product_id: product14.id, category_id: category[4].id }, // Dịch vụ
@@ -410,7 +476,7 @@ async function main() {
     },
   });
   products.push(product15);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product15.id, category_id: category[1].id }, // Bán hàng
       { product_id: product15.id, category_id: category[11].id }, // Nội thất
@@ -431,7 +497,7 @@ async function main() {
     },
   });
   products.push(product16);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product16.id, category_id: category[1].id }, // Bán hàng
       { product_id: product16.id, category_id: category[18].id }, // Y tế
@@ -452,7 +518,7 @@ async function main() {
     },
   });
   products.push(product17);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product17.id, category_id: category[1].id },
       { product_id: product17.id, category_id: category[0].id },
@@ -472,7 +538,7 @@ async function main() {
     },
   });
   products.push(product18);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product18.id, category_id: category[2].id }],
   });
 
@@ -490,7 +556,7 @@ async function main() {
     },
   });
   products.push(product19);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product19.id, category_id: category[2].id }],
   });
   const product20 = await prisma.product.create({
@@ -507,7 +573,7 @@ async function main() {
     },
   });
   products.push(product20);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product20.id, category_id: category[2].id }],
   });
 
@@ -525,7 +591,7 @@ async function main() {
     },
   });
   products.push(product21);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product21.id, category_id: category[2].id }],
   });
   const product22 = await prisma.product.create({
@@ -542,7 +608,7 @@ async function main() {
     },
   });
   products.push(product22);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product22.id, category_id: category[2].id }],
   });
   const product23 = await prisma.product.create({
@@ -559,7 +625,7 @@ async function main() {
     },
   });
   products.push(product23);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [{ product_id: product23.id, category_id: category[2].id }],
   });
 
@@ -577,7 +643,7 @@ async function main() {
     },
   });
   products.push(product24);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product24.id, category_id: category[7].id },
       { product_id: product24.id, category_id: category[3].id },
@@ -597,7 +663,7 @@ async function main() {
     },
   });
   products.push(product25);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product25.id, category_id: category[3].id },
       { product_id: product25.id, category_id: category[4].id },
@@ -618,7 +684,7 @@ async function main() {
     },
   });
   products.push(product26);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product26.id, category_id: category[3].id },
       { product_id: product26.id, category_id: category[12].id },
@@ -639,7 +705,7 @@ async function main() {
     },
   });
   products.push(product27);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product27.id, category_id: category[3].id }, // Công nghệ
       { product_id: product27.id, category_id: category[5].id }, // Doanh nghiệp
@@ -660,7 +726,7 @@ async function main() {
     },
   });
   products.push(product28);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product28.id, category_id: category[11].id }, // Nội thất
       { product_id: product28.id, category_id: category[17].id }, // Kiến trúc
@@ -681,7 +747,7 @@ async function main() {
     },
   });
   products.push(product29);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product29.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product29.id, category_id: category[8].id }, // Giới thiệu
@@ -702,7 +768,7 @@ async function main() {
     },
   });
   products.push(product30);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product30.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product30.id, category_id: category[13].id }, // Pháp luật
@@ -723,7 +789,7 @@ async function main() {
     },
   });
   products.push(product31);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product31.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product31.id, category_id: category[4].id }, // Dịch vụ
@@ -744,7 +810,7 @@ async function main() {
     },
   });
   products.push(product32);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product32.id, category_id: category[4].id }, // Dịch vụ
       { product_id: product32.id, category_id: category[18].id }, // Y tế
@@ -765,7 +831,7 @@ async function main() {
     },
   });
   products.push(product33);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product33.id, category_id: category[4].id }, // Dịch vụ
       { product_id: product33.id, category_id: category[12].id }, // Ô tô
@@ -786,7 +852,7 @@ async function main() {
     },
   });
   products.push(product34);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product34.id, category_id: category[4].id }, // Dịch vụ
       { product_id: product34.id, category_id: category[13].id }, // Pháp luật
@@ -807,7 +873,7 @@ async function main() {
     },
   });
   products.push(product35);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product35.id, category_id: category[4].id }, // Dịch vụ
       { product_id: product35.id, category_id: category[9].id }, // Làm đẹp
@@ -828,7 +894,7 @@ async function main() {
     },
   });
   products.push(product36);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product36.id, category_id: category[4].id }, // Dịch vụ
       { product_id: product36.id, category_id: category[6].id }, // Du lịch
@@ -849,7 +915,7 @@ async function main() {
     },
   });
   products.push(product37);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product37.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product37.id, category_id: category[4].id }, // Dịch vụ
@@ -870,7 +936,7 @@ async function main() {
     },
   });
   products.push(product38);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product38.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product38.id, category_id: category[3].id }, // Công nghệ
@@ -891,7 +957,7 @@ async function main() {
     },
   });
   products.push(product39);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product39.id, category_id: category[5].id }, // Doanh nghiệp
       { product_id: product39.id, category_id: category[4].id }, // Dịch vụ
@@ -912,7 +978,7 @@ async function main() {
     },
   });
   products.push(product40);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product40.id, category_id: category[6].id }, // Du lịch
     ],
@@ -932,7 +998,7 @@ async function main() {
     },
   });
   products.push(product41);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product41.id, category_id: category[6].id }, // Du lịch
       { product_id: product41.id, category_id: category[4].id }, // Dịch vụ
@@ -953,7 +1019,7 @@ async function main() {
     },
   });
   products.push(product42);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product42.id, category_id: category[6].id }, // Du lịch
       { product_id: product42.id, category_id: category[4].id }, // Dịch vụ
@@ -974,7 +1040,7 @@ async function main() {
     },
   });
   products.push(product43);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product43.id, category_id: category[6].id }, // Du lịch
     ],
@@ -994,7 +1060,7 @@ async function main() {
     },
   });
   products.push(product44);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product44.id, category_id: category[6].id }, // Du lịch
     ],
@@ -1014,7 +1080,7 @@ async function main() {
     },
   });
   products.push(product45);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product45.id, category_id: category[7].id }, // Giáo dục
     ],
@@ -1034,7 +1100,7 @@ async function main() {
     },
   });
   products.push(product46);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product46.id, category_id: category[7].id }, // Giáo dục
       { product_id: product46.id, category_id: category[6].id }, // Du lịch (tùy chọn)
@@ -1055,7 +1121,7 @@ async function main() {
     },
   });
   products.push(product47);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product47.id, category_id: category[7].id }, // Giáo dục
     ],
@@ -1075,7 +1141,7 @@ async function main() {
     },
   });
   products.push(product48);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product48.id, category_id: category[15].id }, // Thời trang
     ],
@@ -1095,7 +1161,7 @@ async function main() {
     },
   });
   products.push(product49);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product49.id, category_id: category[15].id }, // Thời trang
     ],
@@ -1115,7 +1181,7 @@ async function main() {
     },
   });
   products.push(product50);
-  await prisma.product_cat.createMany({
+  await prisma.productCategory.createMany({
     data: [
       { product_id: product50.id, category_id: category[7].id }, // Giáo dục
     ],
@@ -1128,7 +1194,7 @@ async function main() {
     const take = Math.floor(Math.random() * 3) + 3; // 3-5
     const chosen = shuffled.slice(0, take);
     for (const svc of chosen) {
-      await prisma.product_service.create({
+      await prisma.productService.create({
         data: {
           product_id: product.id,
           service_id: svc.id,
@@ -1142,7 +1208,7 @@ async function main() {
   for (const product of products) {
     const imageCount = Math.floor(Math.random() * 3) + 2; // 2-4 images
     for (let i = 1; i <= imageCount; i++) {
-      await prisma.images.create({
+      await prisma.productImage.create({
         data: {
           product_id: product.id,
           url: `/product/gallery/${product.id}-${i}.webp`,
@@ -1203,7 +1269,7 @@ async function main() {
 
   // 7) Seed Features
   console.log('⭐ Tạo tính năng...');
-  await prisma.showcase_item.createMany({
+  await prisma.showcaseItem.createMany({
     data: [
       {
         image_url: '/img/Website Sản phẩm vòng đeo Phương Tâm.webp',
@@ -1437,7 +1503,7 @@ async function main() {
   // 8) Seed Pricing Plans (FIXED => price Decimal)
   console.log('💰 Tạo gói dịch vụ...');
   const pricingPlans = await Promise.all([
-    prisma.pricing_plan.create({
+    prisma.pricingPlan.create({
       data: {
         name: 'Gói Cơ bản',
         price: new Prisma.Decimal('8000000'),
@@ -1445,7 +1511,7 @@ async function main() {
         description: 'Phù hợp cho doanh nghiệp nhỏ, startup mới bắt đầu',
       },
     }),
-    prisma.pricing_plan.create({
+    prisma.pricingPlan.create({
       data: {
         name: 'Gói Tiêu chuẩn',
         price: new Prisma.Decimal('15000000'),
@@ -1453,7 +1519,7 @@ async function main() {
         description: 'Dành cho doanh nghiệp vừa với nhu cầu tính năng đa dạng',
       },
     }),
-    prisma.pricing_plan.create({
+    prisma.pricingPlan.create({
       data: {
         name: 'Gói Chuyên nghiệp',
         price: new Prisma.Decimal('25000000'),
@@ -1461,7 +1527,7 @@ async function main() {
         description: 'Giải pháp toàn diện cho doanh nghiệp lớn',
       },
     }),
-    prisma.pricing_plan.create({
+    prisma.pricingPlan.create({
       data: {
         name: 'Gói Doanh nghiệp',
         price: new Prisma.Decimal('40000000'),
@@ -1469,7 +1535,7 @@ async function main() {
         description: 'Gói cao cấp với tính năng tùy chỉnh theo yêu cầu',
       },
     }),
-    prisma.pricing_plan.create({
+    prisma.pricingPlan.create({
       data: {
         name: 'Gói VIP',
         price: new Prisma.Decimal('60000000'),
@@ -1483,7 +1549,7 @@ async function main() {
   console.log('🔗 Tạo liên kết gói dịch vụ - tính năng...');
   // Gói Cơ bản: 4 tính năng
   for (let i = 0; i < 4; i++) {
-    await prisma.pricing_feature.create({
+    await prisma.pricingFeature.create({
       data: {
         pricing_plan_id: pricingPlans[0].id,
         feature_id: features[i].id,
@@ -1492,7 +1558,7 @@ async function main() {
   }
   // Gói Tiêu chuẩn: 6 tính năng
   for (let i = 0; i < 6; i++) {
-    await prisma.pricing_feature.create({
+    await prisma.pricingFeature.create({
       data: {
         pricing_plan_id: pricingPlans[1].id,
         feature_id: features[i].id,
@@ -1501,7 +1567,7 @@ async function main() {
   }
   // Gói Chuyên nghiệp: 8 tính năng
   for (let i = 0; i < 8; i++) {
-    await prisma.pricing_feature.create({
+    await prisma.pricingFeature.create({
       data: {
         pricing_plan_id: pricingPlans[2].id,
         feature_id: features[i].id,
@@ -1510,7 +1576,7 @@ async function main() {
   }
   // Gói Doanh nghiệp: 9 tính năng
   for (let i = 0; i < 9; i++) {
-    await prisma.pricing_feature.create({
+    await prisma.pricingFeature.create({
       data: {
         pricing_plan_id: pricingPlans[3].id,
         feature_id: features[i].id,
@@ -1519,7 +1585,7 @@ async function main() {
   }
   // Gói VIP: tất cả tính năng
   for (let i = 0; i < features.length; i++) {
-    await prisma.pricing_feature.create({
+    await prisma.pricingFeature.create({
       data: {
         pricing_plan_id: pricingPlans[4].id,
         feature_id: features[i].id,
@@ -1917,7 +1983,7 @@ async function main() {
     ],
   });
 
-  await prisma.contact_submission.createMany({
+  await prisma.contactSubmission.createMany({
     data: [
       {
         name: 'Nguyễn Minh Anh',
@@ -2052,19 +2118,7 @@ async function main() {
     ],
   });
 
-  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'kieukienquocbusiness@gmail.com';
-  const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'Startech@2026';
-  const passwordHash = await bcrypt.hash(defaultAdminPassword, 10);
-
-  await prisma.user.create({
-    data: {
-      email: defaultAdminEmail,
-      fullName: 'STARTECH Admin',
-      passwordHash,
-      role: UserRole.SUPER_ADMIN,
-      isActive: true,
-    },
-  });
+  const adminEmail = await upsertAdminUser();
 
   console.log('✅ Seed dữ liệu hoàn thành!');
   console.log(`📊 Thống kê:
@@ -2073,7 +2127,10 @@ async function main() {
    • ${products.length} sản phẩm
    • ${features.length} tính năng
    • ${pricingPlans.length} gói dịch vụ
-   • 1 tài khoản quản trị mặc định (${defaultAdminEmail})`);
+   • 1 tài khoản quản trị (${adminEmail})`);
+  console.warn('');
+  console.warn('✅ Seed completed successfully!');
+  console.warn('Login to admin: ' + adminEmail);
 }
 
 main()
