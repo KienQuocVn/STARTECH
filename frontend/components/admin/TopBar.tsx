@@ -25,18 +25,18 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-slate-200 bg-white/85 px-4 backdrop-blur md:px-6">
+    <header className="admin-shell sticky top-0 z-20 flex h-20 items-center justify-between border-b px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4">
-        <button onClick={toggleSidebar} className="hidden rounded-full border border-slate-200 p-2 transition-colors hover:bg-slate-100 md:block">
+        <button onClick={toggleSidebar} className="hidden rounded-full border border-[var(--border-admin)] p-2 text-[var(--text-body)] transition-colors hover:bg-[var(--surface-subtle)] md:block">
           <Menu size={20} />
         </button>
 
-        <div className="hidden h-12 w-full max-w-md items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 md:flex">
-          <Search size={18} className="text-slate-400" />
+        <div className="hidden h-12 w-full max-w-md items-center gap-3 rounded-2xl border border-[var(--border-admin)] bg-[var(--surface-subtle)] px-4 md:flex">
+          <Search size={18} className="text-[var(--text-muted)]" />
           <input
             readOnly
             value="Tìm kiếm nhanh trong admin..."
-            className="w-full bg-transparent text-sm text-slate-500 outline-none"
+            className="w-full bg-transparent text-sm text-[var(--text-muted)] outline-none"
           />
         </div>
 
@@ -47,14 +47,14 @@ export function TopBar() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-2 py-1.5 transition-colors hover:bg-slate-50">
+            <button className="admin-panel flex items-center gap-3 rounded-2xl px-2 py-1.5 transition-colors hover:bg-[var(--surface-subtle)]">
               <Avatar className="h-9 w-9">
                 <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
               <div className="hidden text-left sm:block">
-                <p className="text-sm font-semibold text-slate-900">Admin</p>
-                <p className="text-xs text-slate-500">STARTECH team</p>
+                <p className="text-sm font-semibold text-[var(--text-strong)]">Admin</p>
+                <p className="text-xs text-[var(--text-muted)]">STARTECH team</p>
               </div>
             </button>
           </DropdownMenuTrigger>

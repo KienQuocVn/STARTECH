@@ -70,7 +70,7 @@ function CollapsibleSection({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between border-b border-slate-200 py-4 text-left text-sm font-semibold text-slate-900 lg:pointer-events-none lg:border-none lg:py-0"
+        className="flex w-full items-center justify-between border-b border-[var(--border-subtle)] py-4 text-left text-sm font-semibold text-[var(--text-strong)] lg:pointer-events-none lg:border-none lg:py-0"
         aria-expanded={isOpen}
         aria-controls={`footer-section-${id}`}
       >
@@ -154,17 +154,17 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t border-slate-200 bg-gradient-to-b from-slate-50 to-white">
+    <footer className="border-t border-[var(--border-subtle)] bg-[var(--section-gradient)]">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="grid gap-8 lg:grid-cols-3">
             <div>
               <Image src="/icon/logo.png" alt="STARTECH" width={180} height={56} className="object-contain" />
-              <p className="mt-4 text-sm leading-7 text-slate-600">{footerContent.companyDescription || ''}</p>
+              <p className="mt-4 text-sm leading-7 text-[var(--text-body)]">{footerContent.companyDescription || ''}</p>
             </div>
 
             <CollapsibleSection id={1} title="Trụ sở chính">
-              <div className="space-y-2 text-sm leading-7 text-slate-600">
+              <div className="space-y-2 text-sm leading-7 text-[var(--text-body)]">
                 {(footerContent.officeInfo ?? []).map((item) => (
                   <p key={item}>{item}</p>
                 ))}
@@ -174,7 +174,7 @@ export function Footer() {
             <CollapsibleSection id={2} title="Dịch vụ">
               <div className="space-y-2">
                 {(footerContent.services ?? []).map((service) => (
-                  <Link key={`${service.name}-${service.href}`} href={service.href} className="block text-sm text-slate-600 transition-colors hover:text-[#1a63a8]">
+                  <Link key={`${service.name}-${service.href}`} href={service.href} className="block text-sm text-[var(--text-body)] transition-colors hover:text-[var(--brand-primary)]">
                     {service.name}
                   </Link>
                 ))}
@@ -182,7 +182,7 @@ export function Footer() {
             </CollapsibleSection>
           </div>
 
-          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+          <div className="panel-elevated rounded-[28px] p-6">
             <h3 className="text-lg font-semibold text-slate-950">Nhận tư vấn nhanh</h3>
             <p className="mt-3 text-sm leading-7 text-slate-600">
               {contactContent.introText || 'Để lại thông tin, STARTECH sẽ liên hệ tư vấn giải pháp phù hợp cho doanh nghiệp của bạn.'}
@@ -206,14 +206,14 @@ export function Footer() {
                 </SelectContent>
               </Select>
               <Textarea placeholder="Nội dung tin nhắn" value={formData.message} onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))} rows={4} />
-              <Button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-[#80d8f9] to-[#1a63a8]">
+              <Button type="submit" disabled={isSubmitting} className="brand-gradient w-full text-white">
                 {isSubmitting ? 'Đang gửi...' : contactContent.submitLabel || 'Gửi yêu cầu'}
               </Button>
             </form>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-[var(--border-subtle)] pt-6 text-sm text-[var(--text-muted)] lg:flex-row lg:items-center lg:justify-between">
           <p>{footerContent.copyright || '© STARTECH. All rights reserved.'}</p>
           <div className="flex flex-wrap items-center gap-3">
             {socialLinks.map((item) => (
@@ -222,7 +222,7 @@ export function Footer() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-[#1a63a8] hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-body)] transition-colors hover:bg-[var(--brand-primary)] hover:text-white"
                 aria-label={item.name}
               >
                 {getSocialIcon(item.name)}

@@ -156,3 +156,19 @@ Neu uu tien dung, du an nay co the duoc day len staging ngay, sau do chot mot vo
 - Yeu cau "Chuyen cac trang marketing chinh sang render tu CMS/admin data, giam hardcode va bo sung resolver dung chung": da hoan thanh cho `dich-vu`, `du-an`, `thiet-ke-website`.
 - Yeu cau "Thay img bang next/image, siet sanitize HTML, lam ro design tokens va cap nhat admin content actions": da hoan thanh o muc marketing core; van con mot so diem `<img>` phu/legacy ngoai luong uu tien.
 - Yeu cau "Chay lint/test lien quan va ra soat diff de chot ket qua": chua thuc hien trong turn nay theo dung yeu cau khong chay build/test; chi ra soat code va docs.
+
+# 9. Cap nhat 2026-04-01
+
+## Nhung viec da chot them trong dot nay
+
+- Da xu ly dut diem diem `<img>` legacy trong frontend runtime bang cach chuyen `ImageWithFallback` sang `next/image`.
+- Da mo rong token giao dien de phu hon cho public/admin shared UI; footer va nhom admin shell/component dung chung da bat dau bo hardcode theo mot he token thong nhat hon.
+- Da bo sung lop an toan cho cac diem inject co chu dich: JSON-LD schema script duoc serialize an toan, chart inline style duoc sanitize truoc khi render.
+- Da noi actor workflow content vao auth context de `createdBy`, `updatedBy`, `approvedBy`, `publishedBy` co gia tri truy vet danh tinh thay vi chi dung log metadata.
+- Da viet lai `backend/README.md` va don `configuration.ts` de tai lieu/cau hinh backend khop voi he thong hien tai.
+
+## Nhung gi van co y nghia ton dong
+
+- Swagger van chi duoc xac nhan qua code path non-production; chua co build/runtime verify trong turn nay.
+- Test backend van ton tai trong repo nhung chua duoc chay lai de chot muc do dong bo voi code sau cung.
+- Login seed credential, env production, backup/monitoring va vong nghiem thu staging van la cac hang muc ban can tiep tuc tu giai doan hardening.

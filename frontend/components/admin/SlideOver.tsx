@@ -46,15 +46,15 @@ export function SlideOver({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
-      <div className={cn('relative z-10 w-full rounded-[28px] border border-slate-200 bg-white shadow-2xl', sizeClasses[size])}>
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+      <div className={cn('admin-panel relative z-10 w-full rounded-[28px]', sizeClasses[size])}>
+        <div className="flex items-center justify-between border-b border-[var(--border-admin)] px-6 py-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Admin modal</p>
-            <h2 className="mt-1 text-xl font-semibold text-slate-950">{title}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">Admin modal</p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--text-strong)]">{title}</h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="rounded-full border border-[var(--border-admin)] p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-subtle)] hover:text-[var(--text-strong)]"
           >
             <X size={18} />
           </button>

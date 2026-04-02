@@ -1,13 +1,9 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Request } from 'express';
 import { PERMISSIONS_KEY } from './permissions.decorator';
 import { ROLES_KEY } from './roles.decorator';
-import type { AdminPermission, AdminRole, JwtPayload } from './interfaces/jwt-payload.interface';
-
-type AuthenticatedRequest = Request & {
-  user?: JwtPayload;
-};
+import type { AdminPermission, AdminRole } from './interfaces/jwt-payload.interface';
+import type { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SiteContentService } from './site-content.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -12,6 +12,7 @@ import {
   UpsertFaqItemDto,
   UpsertPageSectionDto,
 } from './dto/manage-site-content.dto';
+import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Site Content')
 @Controller('site-content')
@@ -39,8 +40,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Tao page content admin' })
-  createPage(@Body() createSitePageDto: CreateSitePageDto) {
-    return this.siteContentService.createPage(createSitePageDto);
+  createPage(@Req() request: AuthenticatedRequest, @Body() createSitePageDto: CreateSitePageDto) {
+    return this.siteContentService.createPage(createSitePageDto, request.user);
   }
 
   @Patch('page/:id')
@@ -48,8 +49,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Cap nhat page content admin' })
-  updatePage(@Param('id', ParseIntPipe) id: number, @Body() updateSitePageDto: UpdateSitePageDto) {
-    return this.siteContentService.updatePage(id, updateSitePageDto);
+  updatePage(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() updateSitePageDto: UpdateSitePageDto) {
+    return this.siteContentService.updatePage(id, updateSitePageDto, request.user);
   }
 
   @Delete('page/:id')
@@ -57,8 +58,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa page content admin' })
-  removePage(@Param('id', ParseIntPipe) id: number) {
-    return this.siteContentService.removePage(id);
+  removePage(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.siteContentService.removePage(id, request.user);
   }
 
   @Post('page/:pageId/section')
@@ -66,8 +67,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Tao/cap nhat section admin' })
-  upsertSection(@Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertPageSectionDto) {
-    return this.siteContentService.upsertSection(pageId, dto);
+  upsertSection(@Req() request: AuthenticatedRequest, @Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertPageSectionDto) {
+    return this.siteContentService.upsertSection(pageId, dto, request.user);
   }
 
   @Delete('section/:id')
@@ -75,8 +76,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa section admin' })
-  removeSection(@Param('id', ParseIntPipe) id: number) {
-    return this.siteContentService.removeSection(id);
+  removeSection(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.siteContentService.removeSection(id, request.user);
   }
 
   @Post('page/:pageId/faq')
@@ -84,8 +85,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Tao/cap nhat FAQ admin' })
-  upsertFaq(@Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertFaqItemDto) {
-    return this.siteContentService.upsertFaq(pageId, dto);
+  upsertFaq(@Req() request: AuthenticatedRequest, @Param('pageId', ParseIntPipe) pageId: number, @Body() dto: UpsertFaqItemDto) {
+    return this.siteContentService.upsertFaq(pageId, dto, request.user);
   }
 
   @Delete('faq/:id')
@@ -93,8 +94,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.delete')
   @ApiOperation({ summary: 'Xoa FAQ admin' })
-  removeFaq(@Param('id', ParseIntPipe) id: number) {
-    return this.siteContentService.removeFaq(id);
+  removeFaq(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.siteContentService.removeFaq(id, request.user);
   }
 
   @Post('page/:id/submit-review')
@@ -102,8 +103,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN', 'EDITOR')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Gui page vao quy trinh review' })
-  submitPageForReview(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
-    return this.siteContentService.submitPageForReview(id, dto);
+  submitPageForReview(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.submitPageForReview(id, dto, request.user);
   }
 
   @Post('page/:id/approve')
@@ -111,8 +112,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Phe duyet page content' })
-  approvePage(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
-    return this.siteContentService.approvePage(id, dto);
+  approvePage(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.approvePage(id, dto, request.user);
   }
 
   @Post('page/:id/request-changes')
@@ -120,8 +121,8 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Yeu cau cap nhat lai noi dung page' })
-  requestChanges(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
-    return this.siteContentService.requestChanges(id, dto);
+  requestChanges(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.requestChanges(id, dto, request.user);
   }
 
   @Post('page/:id/publish')
@@ -129,7 +130,7 @@ export class SiteContentController {
   @Roles('SUPER_ADMIN')
   @Permissions('content.write')
   @ApiOperation({ summary: 'Publish page content len public site' })
-  publishPage(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
-    return this.siteContentService.publishPage(id, dto);
+  publishPage(@Req() request: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number, @Body() dto: ReviewSitePageDto) {
+    return this.siteContentService.publishPage(id, dto, request.user);
   }
 }

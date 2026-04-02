@@ -121,3 +121,12 @@ Du an huong den website gioi thieu dich vu thiet ke website gom:
 - FAQ/noi dung user-facing dang render text da duoc dua qua lop sanitize cho ca plain text va rich text.
 - Swagger da duoc dat dieu kien chi mo o moi truong khong phai production.
 - Backend workflow da duoc siep chat hon: page phai co section truoc khi submit review, version phai o `in_review` moi duoc approve, va phai `approved` moi duoc publish.
+
+# 7. Cap nhat 2026-04-01
+
+- Da thay diem `<img>` legacy cuoi cung trong frontend runtime sang `next/image` qua `frontend/components/image-with-fallback.tsx`; cac the `<img>` con lai nam trong email template backend.
+- Da mo rong semantic token cho public/admin UI voi nhom token admin shell, panel, nav active va status; cac component shared `TopBar`, `Sidebar`, `SlideOver`, `KPICard`, `Footer` da duoc chuyen sang dung token thay vi tiep tuc hardcode mau/chieu sau.
+- Da siet cac diem `dangerouslySetInnerHTML` theo ngu canh: `SchemaScript` serialize JSON-LD an toan cho script tag, `chart.tsx` sanitize CSS identifier/value truoc khi inject style.
+- Da noi actor tu auth context vao workflow content: `create/update/review/approve/publish` tren `site-content` hien cap nhat `createdBy`, `updatedBy`, `approvedBy`, `publishedBy` dong thoi van ghi `actorId` vao `content_audit_log`.
+- Da viet lai `backend/README.md` theo he thong STARTECH thuc te va don `backend/src/config/configuration.ts` de loai bo dau vet config TypeORM cu.
+- Chua build/test lai trong dot cap nhat nay theo dung yeu cau user, vi vay trang thai verification van la `code updated, can user tu chay build/test`.

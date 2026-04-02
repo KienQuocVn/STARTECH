@@ -1,16 +1,11 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-
-type AuthenticatedRequest = Request & {
-  user: JwtPayload;
-};
+import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
 
 @ApiTags('Auth')
 @Controller('auth')

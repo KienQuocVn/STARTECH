@@ -131,3 +131,10 @@ npm run build
 - `docs/public-deploy-audit.md`
 - `docs/architecture.md`
 - `docs/database.md`
+
+## 11. Cap nhat 2026-04-01
+
+- Swagger chi duoc xem la san cho local/dev/non-production; production can giu tat nhu logic trong `backend/src/main.ts`.
+- Seed backend van destructive theo chu dich va phai bat `ALLOW_DESTRUCTIVE_SEED=true` truoc khi chay.
+- Sau dot sua nay, workflow content da ghi duoc actor vao `createdBy`, `updatedBy`, `approvedBy`, `publishedBy` khi thao tac qua auth admin.
+- Chua co build/test moi trong dot nay; neu ban tu chay sau do, nen doi chieu ket qua voi `docs/architecture.md` va `docs/bao-cao-de-cuong.md`.

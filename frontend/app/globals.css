@@ -99,18 +99,29 @@
   --brand-border: rgba(26, 99, 168, 0.14);
   --brand-gradient: linear-gradient(135deg, #80d8f9 0%, #1a63a8 100%);
   --brand-gradient-soft: radial-gradient(circle at top, rgba(128, 216, 249, 0.18), rgba(255, 255, 255, 0.98) 42%, #ffffff 78%);
+  --brand-gradient-admin: linear-gradient(135deg, rgba(26, 99, 168, 0.98) 0%, rgba(128, 216, 249, 0.92) 100%);
   --surface-page: #ffffff;
   --surface-subtle: #f4f9fd;
   --surface-elevated: #ffffff;
   --surface-accent: #d9f3ff;
+  --surface-admin: rgba(255, 255, 255, 0.94);
   --text-strong: #183b56;
   --text-body: #36586d;
   --text-muted: #5c788b;
+  --text-inverse: #ffffff;
   --border-subtle: rgba(26, 99, 168, 0.12);
   --border-strong: rgba(26, 99, 168, 0.22);
+  --border-admin: rgba(24, 59, 86, 0.12);
   --hero-gradient: linear-gradient(180deg, rgba(128, 216, 249, 0.18) 0%, rgba(255, 255, 255, 0.96) 68%);
   --section-gradient: linear-gradient(180deg, rgba(217, 243, 255, 0.28) 0%, rgba(255, 255, 255, 1) 100%);
   --shadow-soft: 0 18px 50px rgba(17, 70, 111, 0.08);
+  --shadow-admin: 0 20px 45px rgba(24, 59, 86, 0.12);
+  --status-success: #0f8a5f;
+  --status-success-soft: rgba(15, 138, 95, 0.12);
+  --status-warning: #b9700f;
+  --status-warning-soft: rgba(185, 112, 15, 0.12);
+  --status-danger: #c54949;
+  --status-danger-soft: rgba(197, 73, 73, 0.12);
   --space-section: clamp(4rem, 6vw, 6rem);
 }
 
@@ -224,5 +235,56 @@
     background: var(--surface-elevated);
     border: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-soft);
+  }
+
+  .text-brand-strong {
+    color: var(--text-strong);
+  }
+
+  .text-brand-body {
+    color: var(--text-body);
+  }
+
+  .text-brand-muted {
+    color: var(--text-muted);
+  }
+
+  .admin-shell {
+    background: var(--surface-admin);
+    border: 1px solid var(--border-admin);
+    box-shadow: var(--shadow-admin);
+    backdrop-filter: blur(18px);
+  }
+
+  .admin-panel {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-admin);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .admin-nav-active {
+    background-image: var(--brand-gradient-admin);
+    color: var(--text-inverse);
+    box-shadow: var(--shadow-admin);
+  }
+
+  .admin-icon-soft {
+    background: var(--surface-accent);
+    color: var(--brand-primary);
+  }
+
+  .status-success-soft {
+    background: var(--status-success-soft);
+    color: var(--status-success);
+  }
+
+  .status-warning-soft {
+    background: var(--status-warning-soft);
+    color: var(--status-warning);
+  }
+
+  .status-danger-soft {
+    background: var(--status-danger-soft);
+    color: var(--status-danger);
   }
 }

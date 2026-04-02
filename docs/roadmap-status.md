@@ -63,3 +63,14 @@ Huong di tiep theo khuyen nghi:
 2. Day staging va nghiem thu full flow admin/public.
 3. Mo rong CMS cho cac section dang hardcode.
 4. Sau khi on dinh moi toi uu them test, audit trail va workflow xet duyet noi dung.
+
+## Cap nhat 2026-04-01
+
+- [x] Frontend standardization cho shared UI.
+  `ImageWithFallback` da dung `next/image`; token da duoc mo rong sang footer va cac admin shared component.
+- [x] README/backend va tai lieu van hanh duoc chuan hoa.
+  README backend da duoc viet lai theo he thong STARTECH thuc te.
+- [x] Workflow audit actor cho content.
+  `site-content` da noi `createdBy`, `updatedBy`, `approvedBy`, `publishedBy` voi auth context.
+- [~] Build/lint/typecheck full repo.
+  Van chua chay lai trong dot nay theo yeu cau khong build/test.

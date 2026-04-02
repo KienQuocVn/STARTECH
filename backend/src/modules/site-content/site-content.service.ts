@@ -10,6 +10,7 @@ import {
   UpsertPageSectionDto,
 } from './dto/manage-site-content.dto';
 import { BusinessEventsService } from '../../shared/business-events/business-events.service';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 type PageSnapshot = {
   id: number;
@@ -57,6 +58,20 @@ export class SiteContentService {
     private readonly prisma: PrismaService,
     private readonly businessEvents: BusinessEventsService,
   ) {}
+
+  private getActorIdentity(actor?: JwtPayload | null) {
+    if (!actor) {
+      return {
+        actorId: null,
+        actorLabel: null,
+      };
+    }
+
+    return {
+      actorId: actor.sub,
+      actorLabel: actor.email,
+    };
+  }
 
   private async getPageOrThrow(id: number) {
     const page = await this.prisma.sitePage.findFirst({
@@ -173,19 +188,23 @@ export class SiteContentService {
     };
   }
 
-  private async markPageAsDraft(pageId: number) {
+  private async markPageAsDraft(pageId: number, actor?: JwtPayload | null) {
+    const { actorLabel } = this.getActorIdentity(actor);
+
     await this.prisma.sitePage.update({
       where: { id: pageId },
       data: {
         workflowStatus: ContentWorkflowStatus.DRAFT,
         submittedAt: null,
         approvedAt: null,
+        updatedBy: actorLabel,
       },
     });
   }
 
-  private async createVersion(pageId: number, workflowStatus: ContentWorkflowStatus, notes?: string | null) {
+  private async createVersion(pageId: number, workflowStatus: ContentWorkflowStatus, notes?: string | null, actor?: JwtPayload | null) {
     const page = await this.getPageOrThrow(pageId);
+    const { actorLabel } = this.getActorIdentity(actor);
     const nextVersionNumber = (page.versions[0]?.versionNumber ?? 0) + 1;
     const snapshot = this.buildSnapshot(page);
 
@@ -196,6 +215,8 @@ export class SiteContentService {
         workflowStatus,
         notes: notes || null,
         snapshotJson: snapshot as Prisma.InputJsonValue,
+        approvedBy: workflowStatus === ContentWorkflowStatus.APPROVED ? actorLabel : null,
+        publishedBy: workflowStatus === ContentWorkflowStatus.PUBLISHED ? actorLabel : null,
       },
     });
   }
@@ -279,11 +300,14 @@ export class SiteContentService {
     };
   }
 
-  async createPage(createSitePageDto: CreateSitePageDto) {
+  async createPage(createSitePageDto: CreateSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const page = await this.prisma.sitePage.create({
       data: {
         ...createSitePageDto,
         workflowStatus: ContentWorkflowStatus.DRAFT,
+        createdBy: actorLabel,
+        updatedBy: actorLabel,
       },
     });
 
@@ -291,8 +315,10 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.create',
       entityId: page.id,
+      actorId,
       metadata: {
         slug: page.slug,
+        actorEmail: actorLabel,
       },
     });
 
@@ -304,7 +330,8 @@ export class SiteContentService {
     };
   }
 
-  async updatePage(id: number, updateSitePageDto: UpdateSitePageDto) {
+  async updatePage(id: number, updateSitePageDto: UpdateSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const page = await this.prisma.sitePage.update({
       where: { id },
       data: {
@@ -312,6 +339,7 @@ export class SiteContentService {
         workflowStatus: ContentWorkflowStatus.DRAFT,
         submittedAt: null,
         approvedAt: null,
+        updatedBy: actorLabel,
       },
     });
 
@@ -319,6 +347,7 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.update',
       entityId: page.id,
+      actorId,
       metadata: updateSitePageDto as Record<string, unknown>,
     });
 
@@ -330,7 +359,8 @@ export class SiteContentService {
     };
   }
 
-  async removePage(id: number) {
+  async removePage(id: number, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     await this.prisma.sitePage.delete({
       where: { id },
     });
@@ -339,6 +369,10 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.delete',
       entityId: id,
+      actorId,
+      metadata: {
+        actorEmail: actorLabel,
+      },
     });
 
     return {
@@ -349,7 +383,8 @@ export class SiteContentService {
     };
   }
 
-  async upsertSection(pageId: number, dto: UpsertPageSectionDto) {
+  async upsertSection(pageId: number, dto: UpsertPageSectionDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const section = dto.id
       ? await this.prisma.pageSection.update({
           where: { id: dto.id },
@@ -366,6 +401,7 @@ export class SiteContentService {
             contentJson: dto.contentJson as Prisma.InputJsonValue | undefined,
             displayOrder: dto.displayOrder ?? 0,
             isActive: dto.isActive ?? true,
+            updatedBy: actorLabel,
           },
         })
       : await this.prisma.pageSection.create({
@@ -383,18 +419,22 @@ export class SiteContentService {
             contentJson: dto.contentJson as Prisma.InputJsonValue | undefined,
             displayOrder: dto.displayOrder ?? 0,
             isActive: dto.isActive ?? true,
+            createdBy: actorLabel,
+            updatedBy: actorLabel,
           },
         });
 
-    await this.markPageAsDraft(pageId);
+    await this.markPageAsDraft(pageId, actor);
 
     this.businessEvents.log({
       entity: 'page_section',
       action: dto.id ? 'content.section.update' : 'content.section.create',
       entityId: section.id,
+      actorId,
       metadata: {
         pageId,
         sectionKey: section.sectionKey,
+        actorEmail: actorLabel,
       },
     });
 
@@ -406,17 +446,23 @@ export class SiteContentService {
     };
   }
 
-  async removeSection(id: number) {
+  async removeSection(id: number, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const section = await this.prisma.pageSection.delete({
       where: { id },
     });
 
-    await this.markPageAsDraft(section.pageId);
+    await this.markPageAsDraft(section.pageId, actor);
 
     this.businessEvents.log({
       entity: 'page_section',
       action: 'content.section.delete',
       entityId: id,
+      actorId,
+      metadata: {
+        pageId: section.pageId,
+        actorEmail: actorLabel,
+      },
     });
 
     return {
@@ -427,7 +473,8 @@ export class SiteContentService {
     };
   }
 
-  async upsertFaq(pageId: number, dto: UpsertFaqItemDto) {
+  async upsertFaq(pageId: number, dto: UpsertFaqItemDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const faq = dto.id
       ? await this.prisma.faqItem.update({
           where: { id: dto.id },
@@ -436,6 +483,7 @@ export class SiteContentService {
             answer: dto.answer,
             displayOrder: dto.displayOrder ?? 0,
             isActive: dto.isActive ?? true,
+            updatedBy: actorLabel,
           },
         })
       : await this.prisma.faqItem.create({
@@ -445,17 +493,21 @@ export class SiteContentService {
             answer: dto.answer,
             displayOrder: dto.displayOrder ?? 0,
             isActive: dto.isActive ?? true,
+            createdBy: actorLabel,
+            updatedBy: actorLabel,
           },
         });
 
-    await this.markPageAsDraft(pageId);
+    await this.markPageAsDraft(pageId, actor);
 
     this.businessEvents.log({
       entity: 'faq_item',
       action: dto.id ? 'content.faq.update' : 'content.faq.create',
       entityId: faq.id,
+      actorId,
       metadata: {
         pageId,
+        actorEmail: actorLabel,
       },
     });
 
@@ -467,17 +519,23 @@ export class SiteContentService {
     };
   }
 
-  async removeFaq(id: number) {
+  async removeFaq(id: number, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const faq = await this.prisma.faqItem.delete({
       where: { id },
     });
 
-    await this.markPageAsDraft(faq.pageId);
+    await this.markPageAsDraft(faq.pageId, actor);
 
     this.businessEvents.log({
       entity: 'faq_item',
       action: 'content.faq.delete',
       entityId: id,
+      actorId,
+      metadata: {
+        pageId: faq.pageId,
+        actorEmail: actorLabel,
+      },
     });
 
     return {
@@ -488,13 +546,14 @@ export class SiteContentService {
     };
   }
 
-  async submitPageForReview(id: number, dto: ReviewSitePageDto) {
+  async submitPageForReview(id: number, dto: ReviewSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const currentPage = await this.getPageOrThrow(id);
     if (!currentPage.sections.length) {
       throw new BadRequestException('Page can it nhat mot section truoc khi gui review.');
     }
 
-    const version = await this.createVersion(id, ContentWorkflowStatus.IN_REVIEW, dto.notes);
+    const version = await this.createVersion(id, ContentWorkflowStatus.IN_REVIEW, dto.notes, actor);
 
     const page = await this.prisma.sitePage.update({
       where: { id },
@@ -502,6 +561,7 @@ export class SiteContentService {
         workflowStatus: ContentWorkflowStatus.IN_REVIEW,
         submittedAt: new Date(),
         approvedAt: null,
+        updatedBy: actorLabel,
       },
       include: {
         sections: { where: { deletedAt: null }, orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }] },
@@ -515,9 +575,11 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.submit_review',
       entityId: id,
+      actorId,
       metadata: {
         versionId: version.id,
         notes: dto.notes ?? null,
+        actorEmail: actorLabel,
       },
     });
 
@@ -529,7 +591,8 @@ export class SiteContentService {
     };
   }
 
-  async approvePage(id: number, dto: ReviewSitePageDto) {
+  async approvePage(id: number, dto: ReviewSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const latestVersion = await this.getLatestVersion(id);
 
     if (!latestVersion) {
@@ -545,6 +608,7 @@ export class SiteContentService {
       data: {
         workflowStatus: ContentWorkflowStatus.APPROVED,
         notes: dto.notes ?? latestVersion.notes,
+        approvedBy: actorLabel,
       },
     });
 
@@ -553,6 +617,7 @@ export class SiteContentService {
       data: {
         workflowStatus: ContentWorkflowStatus.APPROVED,
         approvedAt: new Date(),
+        updatedBy: actorLabel,
       },
       include: {
         sections: { where: { deletedAt: null }, orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }] },
@@ -566,9 +631,11 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.approve',
       entityId: id,
+      actorId,
       metadata: {
         versionId: latestVersion.id,
         notes: dto.notes ?? null,
+        actorEmail: actorLabel,
       },
     });
 
@@ -580,7 +647,8 @@ export class SiteContentService {
     };
   }
 
-  async requestChanges(id: number, dto: ReviewSitePageDto) {
+  async requestChanges(id: number, dto: ReviewSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const latestVersion = await this.getLatestVersion(id);
 
     if (latestVersion) {
@@ -598,6 +666,7 @@ export class SiteContentService {
       data: {
         workflowStatus: ContentWorkflowStatus.CHANGES_REQUESTED,
         approvedAt: null,
+        updatedBy: actorLabel,
       },
       include: {
         sections: { where: { deletedAt: null }, orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }] },
@@ -611,9 +680,11 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.request_changes',
       entityId: id,
+      actorId,
       metadata: {
         versionId: latestVersion?.id ?? null,
         notes: dto.notes ?? null,
+        actorEmail: actorLabel,
       },
     });
 
@@ -625,7 +696,8 @@ export class SiteContentService {
     };
   }
 
-  async publishPage(id: number, dto: ReviewSitePageDto) {
+  async publishPage(id: number, dto: ReviewSitePageDto, actor?: JwtPayload | null) {
+    const { actorId, actorLabel } = this.getActorIdentity(actor);
     const version = await this.getLatestVersion(id);
 
     if (!version) {
@@ -641,6 +713,7 @@ export class SiteContentService {
       data: {
         workflowStatus: ContentWorkflowStatus.PUBLISHED,
         notes: dto.notes ?? version.notes,
+        publishedBy: actorLabel,
       },
     });
 
@@ -651,6 +724,7 @@ export class SiteContentService {
         approvedAt: new Date(),
         publishedAt: new Date(),
         publishedVersionId: publishedVersion.id,
+        updatedBy: actorLabel,
       },
       include: {
         sections: { where: { deletedAt: null }, orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }] },
@@ -664,9 +738,11 @@ export class SiteContentService {
       entity: 'site_page',
       action: 'content.page.publish',
       entityId: id,
+      actorId,
       metadata: {
         versionId: publishedVersion.id,
         notes: dto.notes ?? null,
+        actorEmail: actorLabel,
       },
     });
 

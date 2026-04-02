@@ -51,7 +51,7 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setMobileMenuOpen((current) => !current)}
-        className="fixed left-4 top-4 z-40 rounded-lg p-2 hover:bg-gray-100 md:hidden"
+        className="admin-panel fixed left-4 top-4 z-40 rounded-lg p-2 text-[var(--text-body)] hover:bg-[var(--surface-subtle)] md:hidden"
       >
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -60,12 +60,12 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-slate-200 bg-white/95 text-slate-900 shadow-xl shadow-slate-200/40 backdrop-blur md:relative md:z-0 md:shadow-none',
+          'admin-shell fixed left-0 top-0 z-40 flex h-screen flex-col border-r text-[var(--text-strong)] md:relative md:z-0 md:shadow-none',
           sidebarCollapsed ? 'w-[88px]' : 'w-[280px]',
           !mobileMenuOpen && 'hidden md:flex',
         )}
       >
-        <div className="flex h-20 items-center justify-between border-b border-slate-200 px-5">
+        <div className="flex h-20 items-center justify-between border-b border-[var(--border-admin)] px-5">
           <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/icon/logo.png"
@@ -79,7 +79,7 @@ export function Sidebar() {
 
           <button
             onClick={toggleSidebar}
-            className="hidden rounded-full border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:block"
+            className="hidden rounded-full border border-[var(--border-admin)] p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-subtle)] hover:text-[var(--text-strong)] lg:block"
           >
             <ChevronRight size={18} className={cn('transition-transform', sidebarCollapsed && 'rotate-180')} />
           </button>
@@ -102,8 +102,8 @@ export function Sidebar() {
                 className={cn(
                   'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all',
                   active
-                    ? 'bg-[linear-gradient(135deg,#2563eb_0%,#4f46e5_100%)] text-white shadow-lg shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
+                    ? 'admin-nav-active'
+                    : 'text-[var(--text-body)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-strong)]',
                 )}
               >
                 <Icon size={20} className="shrink-0" />
@@ -113,12 +113,12 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="space-y-2 border-t border-slate-200 p-4">
+        <div className="space-y-2 border-t border-[var(--border-admin)] p-4">
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-blue-600 transition-all hover:bg-blue-50"
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-[var(--brand-primary)] transition-all hover:bg-[var(--surface-accent)]"
           >
             <Globe size={20} />
             {!sidebarCollapsed && 'Xem website'}
@@ -126,7 +126,7 @@ export function Sidebar() {
           <button
             onClick={handleLogout}
             disabled={isPending}
-            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition-all hover:bg-red-50 hover:text-red-500"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-[var(--text-body)] transition-all hover:bg-[var(--status-danger-soft)] hover:text-[var(--status-danger)]"
           >
             <LogOut size={20} />
             {!sidebarCollapsed && (isPending ? 'Đang xử lý...' : 'Đăng xuất')}
