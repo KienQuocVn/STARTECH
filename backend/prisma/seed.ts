@@ -88,7 +88,7 @@ async function main() {
   console.warn('🔄 Proceeding with seed...\n');
 
   prisma.$use(async (params, next) => {
-    if (params.model === 'product' && params.action === 'create') {
+    if (params.model === 'Product' && params.action === 'create') {
       const name = params.args?.data?.name;
       if (typeof name === 'string' && !params.args.data.slug) {
         params.args.data.slug = toSlug(name);
